@@ -1,0 +1,3 @@
+Copyright (c) <%= owner %> <%= years %>. All Rights Reserved.
+Project name: <%= name %>
+This project is licensed under the MIT License, see LICENSE
