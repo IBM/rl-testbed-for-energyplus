@@ -3351,8 +3351,6 @@
 
   Output:Constructions,Constructions;
 
-!********** Addition by CRIL **********
-
 ! Following four lines to avoid error
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
   Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;

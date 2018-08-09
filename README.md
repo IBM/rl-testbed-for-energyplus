@@ -140,11 +140,11 @@ Output files are generated under the directory ${ENERGYPLUS_LOGBASE}/openai-YYYY
 - output/episode-NNNNNNNN/ Episode data
 
 Epsiode data contains the following files:
-- 2ZoneDataCenterHVAC_wEconomizer-CRIL-RL-oneyear.idf  A copy of mode file used in the simulation of the episode
-- USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw         A copy of weather file used in the simulation of the episode
-- eplusout.csv.gz     Simulatiokn result in CSV format
-- eplusout.err        Error message. You need make sure that there are no Severe errors.
-- eplusout.htm        Human readble report file.
+- 2ZoneDataCenterHVAC_wEconomizer_Temp_Fan.idf  A copy of model file used in the simulation of the episode
+- USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw  A copy of weather file used in the simulation of the episode
+- eplusout.csv.gz                               Simulatiokn result in CSV format
+- eplusout.err                                  Error message. You need make sure that there are no Severe errors
+- eplusout.htm                                  Human readble report file
 
 ### Monitoring
 
