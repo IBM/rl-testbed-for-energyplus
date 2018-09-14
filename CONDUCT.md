@@ -12,7 +12,7 @@ This project is committed to maintain a **positive** [work environment](#work-en
 1. Never [harass](#harassment) or [bully](#workplace-bullying) anyone verbally, physically or [sexually](#sexual-harassment).
 1. Never [discriminate](#discrimination) on the basis of personal characteristics or group membership.
 1. Communicate constructively and avoid [demeaning](#demeaning-behavior) or [insulting](#insulting-behavior) behavior or language.
-1. Seek, accept, and offer objective work criticism, and [acknowledge](#acknowledgement] properly the contributions of others.
+1. Seek, accept, and offer objective work criticism, and [acknowledge](#acknowledgement) properly the contributions of others.
 1. Be honest about your own qualifications, and about any circumstances that might lead to conflicts of interest.
 1. Respect the privacy of others and the confidentiality of data you access.
 1. With respect to cultural differences, be conservative in what you do and liberal in what you accept from others, but not to the point of accepting disrespectful, unprofessional or unfair or [unwelcome behavior](#unwelcome-behavior) or [advances](#unwelcome-sexual-advance).
