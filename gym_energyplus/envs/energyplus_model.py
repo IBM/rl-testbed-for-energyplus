@@ -246,7 +246,7 @@ class EnergyPlusModel(metaclass=ABCMeta):
             self.reward = []
             self.reward_mean = []
             self.episode_dirs = []
-            for rew, len, time in zip(df['r'], df['l'], df['t']):
+            for rew, len, time_ in zip(df['r'], df['l'], df['t']):
                 self.reward.append(rew / len)
                 self.reward_mean.append(rew / len)
                 self.episode_dirs.append(self.log_dir + '/output/episode-{:08d}'.format(self.num_episodes))
