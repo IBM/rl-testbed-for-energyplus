@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # noinspection PyUnresolvedReferences
 import argparse
+import os
 
 from baselines_energyplus.common.energyplus_util import make_energyplus_env, energyplus_locate_log_dir
-#import os
 import gym_energyplus
 
 def plot_energyplus_arg_parser():
