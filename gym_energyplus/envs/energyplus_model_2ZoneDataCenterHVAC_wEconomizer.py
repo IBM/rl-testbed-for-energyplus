@@ -16,13 +16,13 @@ import matplotlib.pyplot as plt
 import matplotlib
 from matplotlib.widgets import Slider, Button, RadioButtons
 
-class EnergyPlusModel2ZoneDataCenterHVAC_wEconomizer_Temp(EnergyPlusModel):
+class EnergyPlusModel2ZoneDataCenterHVAC_wEconomizer(EnergyPlusModel):
 
     def __init__(self,
                  model_file,
                  log_dir,
                  verbose=False):
-        super(EnergyPlusModel2ZoneDataCenterHVAC_wEconomizer_Temp, self).__init__(model_file, log_dir, verbose)
+        super(EnergyPlusModel2ZoneDataCenterHVAC_wEconomizer, self).__init__(model_file, log_dir, verbose)
         self.reward_low_limit = -10000.
         self.axepisode = None
         self.num_axes = 5

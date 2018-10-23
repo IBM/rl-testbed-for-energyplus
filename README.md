@@ -107,11 +107,11 @@ export ENERGYPLUS="${ENERGYPLUS_DIR}/energyplus"
 # Weather file.
 # Single weather file or multiple weather files separated by comma character.
 export ENERGYPLUS_WEATHER="${WEATHER_DIR}/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
-#export ENERGYPLUS_WEATHER="${WEATHER_DIR}/USA_VA_Sterling-Washington.Dulles.Intl.AP.724030_TMY3.epw"
+#export ENERGYPLUS_WEATHER="${WEATHER_DIR}/USA_CO_Golden-NREL.724666_TMY3.epw"
 #export ENERGYPLUS_WEATHER="${WEATHER_DIR}/USA_FL_Tampa.Intl.AP.722110_TMY3.epw"
 #export ENERGYPLUS_WEATHER="${WEATHER_DIR}/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw"
-#export ENERGYPLUS_WEATHER="${WEATHER_DIR}/USA_CO_Golden-NREL.724666_TMY3.epw"
-#export ENERGYPLUS_WEATHER="${WEATHER_DIR}/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw,${WEATHER_DIR}/USA_VA_Sterling-Washington.Dulles.Intl.AP.724030_TMY3.epw,${WEATHER_DIR}/USA_FL_Tampa.Intl.AP.722110_TMY3.epw"
+#export ENERGYPLUS_WEATHER="${WEATHER_DIR}/USA_VA_Sterling-Washington.Dulles.Intl.AP.724030_TMY3.epw"
+#export ENERGYPLUS_WEATHER="${WEATHER_DIR}/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw,${WEATHER_DIR}/USA_CO_Golden-NREL.724666_TMY3.epw,${WEATHER_DIR}/USA_FL_Tampa.Intl.AP.722110_TMY3.epw"
 
 # Ouput directory "openai-YYYY-MM-DD-HH-MM-SS-mmmmmm" is created in
 # the directory specified by ENERGYPLUS_LOGBASE or in the current directory if not specified.
@@ -156,7 +156,7 @@ Options:
 - -l <log_dir>    Specify log directory (usually openai-YYYY-MM-DD-HH-MM-SS-mmmmmm)
 - -c <csv_file>   Specify single CSV file to view
 - -d              Dump every timestep in CSV file (dump_timesteps.csv)
-- -D              Dump episodes in CSV file (dump_episodes)
+- -D              Dump episodes in CSV file (dump_episodes.dat)
 ```
 
 If neither `-l` nor `-c` option is specified, plot_energyplus tries to open the latest directory under `${ENERGYPLUS_LOG}` directory.

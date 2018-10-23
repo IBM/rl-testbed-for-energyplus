@@ -17,7 +17,7 @@ import matplotlib
 from matplotlib.widgets import Slider, Button, RadioButtons
 
 class EnergyPlusModel2ZoneDataCenterHVAC_wEconomizer_Temp_Fan(EnergyPlusModel):
-    
+
     def __init__(self,
                  model_file,
                  log_dir,
@@ -88,14 +88,14 @@ class EnergyPlusModel2ZoneDataCenterHVAC_wEconomizer_Temp_Fan(EnergyPlusModel):
             self.raw_state = raw_state
         else:
             self.raw_state = [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
-    
+
     def compute_reward(self):
         rew, _ = self._compute_reward()
         return rew
 
     def _compute_reward(self, raw_state = None):
-        #return self.compute_reward_center23_5_gaussian1_0_trapezoid1_0_pue0_0(raw_state)
         return self.compute_reward_center23_5_gaussian1_0_trapezoid0_1_pue0_0(raw_state)
+        #return self.compute_reward_center23_5_gaussian1_0_trapezoid1_0_pue0_0(raw_state)
         #return self.compute_reward_gaussian1_0_trapezoid1_0_pue0_0(raw_state)
         #return self.compute_reward_gaussian1_0_trapezoid0_1_pue0_0_pow0(raw_state)
         #return self.compute_reward_gaussian1_0_trapezoid1_0_pue0_0(raw_state)
@@ -159,7 +159,7 @@ class EnergyPlusModel2ZoneDataCenterHVAC_wEconomizer_Temp_Fan(EnergyPlusModel):
             PUE_weight = 0.0,
             Whole_Building_Power_weight = 1 / 100000.0,
             raw_state = raw_state)
-    
+
     def compute_reward_gaussian_pue0_0(self, raw_state = None): # gaussian, PUE
         return self.compute_reward_common(
             temperature_center = 22.5,
@@ -171,7 +171,7 @@ class EnergyPlusModel2ZoneDataCenterHVAC_wEconomizer_Temp_Fan(EnergyPlusModel):
             PUE_weight = 1.0,
             Whole_Building_Power_weight = 0.,
             raw_state = raw_state)
-    
+
     def compute_reward_gaussian_whole_power(self, raw_state = None): # gaussian, whole power
         return self.compute_reward_common(
             temperature_center = 22.5,
@@ -183,7 +183,7 @@ class EnergyPlusModel2ZoneDataCenterHVAC_wEconomizer_Temp_Fan(EnergyPlusModel):
             PUE_weight = 0.0, # PUE not used
             Whole_Building_Power_weight = 1 / 100000.,
             raw_state = raw_state)
-    
+
     def compute_reward_common(self, 
                               temperature_center = 22.5,
                               temperature_tolerance = 0.5,
@@ -239,9 +239,9 @@ class EnergyPlusModel2ZoneDataCenterHVAC_wEconomizer_Temp_Fan(EnergyPlusModel):
             print('compute_reward: rew={:7.3f} (temp_gaussian1={:7.3f}, temp_gaussian2={:7.3f}, temp_trapezoid1={:7.3f}, temp_trapezoid2={:7.3f}, fluct={:7.3f}, PUE={:7.3f}, Power={:7.3f})'.format(rew, rew_temp_gaussian1, rew_temp_gaussian2, rew_temp_trapezoid1, rew_temp_trapezoid2, rew_fluct, rew_PUE, rew_Whole_Building_Power))
         if os.path.exists("/tmp/verbose2"):
             print('compute_reward: Tenv={:7.3f}, Tz1={:7.3f}, Tz2={:7.3f}, PUE={:7.3f}, Whole_Powerd2={:8.1f}, ITE_Power={:8.1f}, HVAC_Power={:8.1f}, Act1={:7.3f}, Act2={:7.3f}, Act3={:7.3f}, Act4={:7.3f}'.format(Tenv, Tz1, Tz2, PUE, Whole_Building_Power, IT_Equip_Power, Whole_HVAC_Power, self.action[0], self.action[1], self.action[2], self.action[3]))
-        
+
         return rew, (rew_temp_gaussian1, rew_temp_trapezoid1, rew_temp_gaussian2, rew_temp_trapezoid2, rew_Whole_Building_Power)
-    
+
     # Performes mapping from raw_state (retrieved from EnergyPlus process as is) to gym compatible state
     #
     #   state[0] = raw_state[0]: Environment:Site Outdoor Air Drybulb Temperature [C](TimeStep)
