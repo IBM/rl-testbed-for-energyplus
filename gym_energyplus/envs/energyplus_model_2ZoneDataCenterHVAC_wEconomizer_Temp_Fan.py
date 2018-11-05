@@ -366,7 +366,10 @@ class EnergyPlusModel2ZoneDataCenterHVAC_wEconomizer_Temp_Fan(EnergyPlusModel):
         if self.axepisode is None: # Does this really help for performance ?
             self.axepisode = []
             for i in range(self.num_axes):
-                ax = self.fig.add_axes([0.05, 1.00 - 0.70 / self.num_axes * (i + 1), 0.90, 0.12])
+                if i == 0:
+                    ax = self.fig.add_axes([0.05, 1.00 - 0.70 / self.num_axes * (i + 1), 0.90, 0.12])
+                else:
+                    ax = self.fig.add_axes([0.05, 1.00 - 0.70 / self.num_axes * (i + 1), 0.90, 0.12], sharex=self.axepisode[0])
                 ax.set_xmargin(0)
                 self.axepisode.append(ax)
                 ax.set_xticks(self.x_pos)
