@@ -26,7 +26,7 @@ class EnergyPlusModel2ZoneDataCenterHVAC_wEconomizer_Temp_Fan(EnergyPlusModel):
         self.reward_low_limit = -10000.
         self.axepisode = None
         self.num_axes = 5
-        self.text_power_consumption = None
+        self.text_power_consumption = []
 
         self.electric_powers = [
             #'Whole Building:Facility Total Electric Demand Power [W](Hourly)', # very high
@@ -519,11 +519,12 @@ class EnergyPlusModel2ZoneDataCenterHVAC_wEconomizer_Temp_Fan(EnergyPlusModel):
             ax.tick_params(labelbottom='on')
 
         # Show average power consumption in text
-        if self.text_power_consumption is not None:
-            self.text_power_consumption.remove()
-        self.text_power_consumption = self.fig.text(0.02,  0.25, 'Whole Power:    {:6,.1f} kW'.format(np.average(self.df['Whole Building:Facility Total Electric Demand Power [W](Hourly)']) / 1000))
-        self.text_power_consumption = self.fig.text(0.02,  0.235, 'Building Power: {:6,.1f} kW'.format(np.average(self.df['Whole Building:Facility Total Building Electric Demand Power [W](Hourly)']) / 1000))
-        self.text_power_consumption = self.fig.text(0.02,  0.22, 'HVAC Power:     {:6,.1f} kW'.format(np.average(self.df['Whole Building:Facility Total HVAC Electric Demand Power [W](Hourly)']) / 1000))
+        for text in self.text_power_consumption:
+            text.remove()
+        self.text_power_consumption = []
+        self.text_power_consumption.append(self.fig.text(0.02,  0.25, 'Whole Power:    {:6,.1f} kW'.format(np.average(self.df['Whole Building:Facility Total Electric Demand Power [W](Hourly)']) / 1000)))
+        self.text_power_consumption.append(self.fig.text(0.02,  0.235, 'Building Power: {:6,.1f} kW'.format(np.average(self.df['Whole Building:Facility Total Building Electric Demand Power [W](Hourly)']) / 1000)))
+        self.text_power_consumption.append(self.fig.text(0.02,  0.22, 'HVAC Power:     {:6,.1f} kW'.format(np.average(self.df['Whole Building:Facility Total HVAC Electric Demand Power [W](Hourly)']) / 1000)))
 
     #--------------------------------------------------
     # Dump timesteps
