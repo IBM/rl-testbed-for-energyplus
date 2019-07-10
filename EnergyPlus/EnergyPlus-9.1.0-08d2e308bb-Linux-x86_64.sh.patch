@@ -1,0 +1,23 @@
+*** EnergyPlus-9.1.0-08d2e308bb-Linux-x86_64.sh.orig	Tue Jul  9 16:52:10 2019
+--- EnergyPlus-9.1.0-08d2e308bb-Linux-x86_64.sh	Wed Jul 10 12:21:28 2019
+***************
+*** 74,82 ****
+  use_new_tail_syntax="-n"
+  tail $use_new_tail_syntax +1 "$0" 2>&1 > /dev/null || use_new_tail_syntax=""
+  
+! mkdir -p "${install_directory}"
+  
+! tail $use_new_tail_syntax +163 "$0" | gunzip | (cd "${install_directory}" && tar xf -) || exit 1 "Problem unpacking the EnergyPlus-9.1.0-08d2e308bb-Linux-x86_64"
+  
+  echo "Unpacking to directory ${install_directory} was successful."
+  
+--- 74,82 ----
+  use_new_tail_syntax="-n"
+  tail $use_new_tail_syntax +1 "$0" 2>&1 > /dev/null || use_new_tail_syntax=""
+  
+! mkdir -p "${install_directory}/${package_name}"
+  
+! tail $use_new_tail_syntax +163 "$0" | gunzip | (cd "${install_directory}/${package_name}" && tar xf -) || exit 1 "Problem unpacking the EnergyPlus-9.1.0-08d2e308bb-Linux-x86_64"
+  
+  echo "Unpacking to directory ${install_directory} was successful."
+  
