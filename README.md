@@ -34,7 +34,7 @@ You need to download ver. 9.1.0 from https://github.com/NREL/EnergyPlus/releases
 $ cd <DOWNLOAD-DIRECTORY>
 $ patch -p0 < rl-testbed-for-energyplus/EnergyPlus/EnergyPlus-9.1.0-08d2e308bb-Linux-x86_64.sh.patch
 ```
-3. Execute installation image.
+4. Execute installation image.
 ```
 $ sudo bash <DOWNLOAD-DIRECTORY>/EnergyPlus-9.1.0-08d2e308bb-Linux-x86_64.sh
 ```
