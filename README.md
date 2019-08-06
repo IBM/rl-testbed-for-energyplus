@@ -22,9 +22,24 @@ Installaton of rl-testbed-for-energyplus consists of three parts:
 ### Install EnergyPlus prebuild package
 First, download pre-built package of EnergyPlus and install it.
 This is not for executing normal version of EnergyPlus, but to get some pre-compiled binaries and data files that can not be generated from source code.
-You need to download ver. 9.1.0 from https://github.com/NREL/EnergyPlus/releases/tag/v9.1.0.
+You need to download either EnergyPlus ver. 8.8.0 from https://github.com/NREL/EnergyPlus/releases/tag/v8.8.0 or
+ver. 9.1.0 from https://github.com/NREL/EnergyPlus/releases/tag/v9.1.0.
 
-#### Ubuntu
+#### Ubuntu (EnergyPlus 8.8.0)
+
+1. Go to the web page shown above.
+2. Right click
+   [EnergyPlus-8.8.0-7c3bbe4830-Linux-x86_64.sh](https://github.com/NREL/EnergyPlus/releases/download/v8.8.0/EnergyPlus-8.8.0-7c3bbe4830-Linux-x86_64.sh) and select `Save link As` to from the menu to download installation image.
+   3. Execute installation image.
+   ```
+   $ sudo bash <DOWNLOAD-DIRECTORY>/EnergyPlus-8.8.0-7c3bbe4830-Linux-x86_64.sh
+   ```
+   Enter your admin password if required.
+   Specify `/usr/local` for install directory.
+   Respond with `/usr/local/bin` if asked for symbolic link location.
+   The package will be installed at `/usr/local/EnergyPlus-8-8-0`.
+
+#### Ubuntu (EnergyPlus 9.1.0)
 
 1. Go to the web page shown above.
 2. Right click
@@ -43,7 +58,15 @@ Specify `/usr/local` for install directory.
 Respond with `/usr/local/bin` if asked for symbolic link location.
 The package will be installed at `/usr/local/EnergyPlus-9-1-0`.
 
-#### macOS
+#### macOS (EnergyPlus 8.8.0)
+
+1. Go to the web page shown above.
+2. Right click
+   [EnergyPlus-8.8.0-7c3bbe4830-Darwin-x86_64.dmg](https://github.com/NREL/EnergyPlus/releases/download/v8.8.0/EnergyPlus-8.8.0-7c3bbe4830-Darwin-x86_64.dmg) and select Save link As` to from the menu to download installation image.
+3. Double click the downloaded package, and follow the instructions.
+The package will be installed in `/Applications/EnergyPlus-8-8-0`.
+
+#### macOS (EnergyPlus 9.1.0)
 
 1. Go to the web page shown above.
 2. Right click
@@ -57,7 +80,8 @@ Download source code of EnergyPlus and rl-testbed-for-energyplus.
 
 ```
 $ cd <WORKING-DIRECTORY>
-$ git clone -b v9.1.0 git@github.com:NREL/EnergyPlus.git
+$ git clone -b v8.8.0 git@github.com:NREL/EnergyPlus.git # For EnergyPlus 8.8.0
+$ git clone -b v9.1.0 git@github.com:NREL/EnergyPlus.git # For EnergyPlus 9.1.0
 $ git clone git@github.com:ibm/rl-testbed-for-energyplus.git
 ```
 
@@ -65,11 +89,14 @@ Apply patch to EnergyPlus and build.
 
 ```
 $ cd <WORKING-DIRECTORY>/EnergyPlus
-$ patch -p1 < ../rl-testbed-for-energyplus/EnergyPlus/RL-patch-for-EnergyPlus-9-1-0.patch
+$ patch -p1 < ../rl-testbed-for-energyplus/EnergyPlus/RL-patch-for-EnergyPlus-8-8-0.patch # For EnergyPlus 8.8.0
+$ patch -p1 < ../rl-testbed-for-energyplus/EnergyPlus/RL-patch-for-EnergyPlus-9-1-0.patch # For EnergyPlus 9.1.0
 $ mkdir build
 $ cd build
-$ cmake -DCMAKE_INSTALL_PREFIX=/usr/local/EnergyPlus-9-1-0 ..    # Ubuntu case
-$ cmake -DCMAKE_INSTALL_PREFIX=/Applications/EnergyPlus-9-1-0 .. # macOS case
+$ cmake -DCMAKE_INSTALL_PREFIX=/usr/local/EnergyPlus-8-8-0 ..    # For Ubuntu (EnergyPlus 8.8.0)
+$ cmake -DCMAKE_INSTALL_PREFIX=/usr/local/EnergyPlus-9-1-0 ..    # For Ubuntu (EnergyPlus 9.1.0)
+$ cmake -DCMAKE_INSTALL_PREFIX=/Applications/EnergyPlus-8-8-0 .. # For macOS (EnergyPlus 8.8.0)
+$ cmake -DCMAKE_INSTALL_PREFIX=/Applications/EnergyPlus-9-1-0 .. # For macOS (EnergyPlus 9.1.0)
 $ make -j4
 ```
 
@@ -103,7 +130,8 @@ if [ `uname` == "Darwin" ]; then
 else
 	energyplus_instdir="/usr/local"
 fi
-ENERGYPLUS_VERSION="9-1-0"
+ENERGYPLUS_VERSION="8-8-0" # For EnergyPlus 8.8.0
+ENERGYPLUS_VERSION="9-1-0" # For EnergyPlus 9.1.0
 ENERGYPLUS_DIR="${energyplus_instdir}/EnergyPlus-${ENERGYPLUS_VERSION}"
 WEATHER_DIR="${ENERGYPLUS_DIR}/WeatherData"
 export ENERGYPLUS="${ENERGYPLUS_DIR}/energyplus"
