@@ -214,8 +214,22 @@ The reward value shown above is computed by applying reward function to the simu
 ## License <a name="license"></a>
 The Reinforcement Learning Testbed for Power Consumption Optimization Project uses the [MIT License](LICENSE) software license.
 
+## How to cite
+For citing the use or extension of this testbed, you may cite our paper at AsiaSim 2018, which can be found at [Springer](https://link.springer.com/chapter/10.1007/978-981-13-2853-4_4) or as a slightly revised version at [Arxiv](https://arxiv.org/abs/1808.10427).  You may use the following BibTeX entry:
+```
+@InProceedings{10.1007/978-981-13-2853-4_4,
+author="Moriyama, Takao and De Magistris, Giovanni and Tatsubori, Michiaki and Pham, Tu-Hoa and Munawar, Asim and Tachibana, Ryuki",
+title="Reinforcement Learning Testbed for Power-Consumption Optimization",
+booktitle="Methods and Applications for Modeling and Simulation of Complex Systems",
+year="2018",
+publisher="Springer Singapore",
+address="Singapore",
+pages="45--59",
+isbn="978-981-13-2853-4"
+}
+```
+
 ## Related information
-- AsiaSim2018: http://jsst.jp/asiasim2018 - A technical paper on this project will be presented at this conference.
 - A pre-print version of AsiaSim2018 paper on arXiv: https://arxiv.org/abs/1808.10427
 - EnergyPlus: https://github.com/NREL/EnergyPlus
 - OpenAI Gym: https://github.com/OpenAI/gym
