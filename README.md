@@ -19,57 +19,67 @@ Installaton of rl-testbed-for-energyplus consists of three parts:
 - Build patched EnergyPlus
 - Install built executables
 
-### Install EnergyPlus prebuild package
+### Install EnergyPlus prebuilt package
 First, download pre-built package of EnergyPlus and install it.
 This is not for executing normal version of EnergyPlus, but to get some pre-compiled binaries and data files that can not be generated from source code.
-You need to download ver. 9.1.0 from https://github.com/NREL/EnergyPlus/releases/tag/v9.1.0.
+
+Supported EnergyPlus versions:
+
+|       | Linux                                                                                                                                                  | MacOS                                                                                                                                                      |
+|-------|--------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 8.8.0 | [EnergyPlus-8.8.0-7c3bbe4830-Linux-x86_64.sh](https://github.com/NREL/EnergyPlus/releases/download/v8.8.0/EnergyPlus-8.8.0-7c3bbe4830-Linux-x86_64.sh) | [EnergyPlus-8.8.0-7c3bbe4830-Darwin-x86_64.dmg](https://github.com/NREL/EnergyPlus/releases/download/v8.8.0/EnergyPlus-8.8.0-7c3bbe4830-Darwin-x86_64.dmg) |
+| 9.1.0 | [EnergyPlus-9.1.0-08d2e308bb-Linux-x86_64.sh](https://github.com/NREL/EnergyPlus/releases/download/v9.1.0/EnergyPlus-9.1.0-08d2e308bb-Linux-x86_64.sh) | [EnergyPlus-9.1.0-08d2e308bb-Darwin-x86_64.dmg](https://github.com/NREL/EnergyPlus/releases/download/v9.1.0/EnergyPlus-9.1.0-08d2e308bb-Darwin-x86_64.dmg) |
+| 9.2.0 | [EnergyPlus-9.2.0-921312fa1d-Linux-x86_64.sh](https://github.com/NREL/EnergyPlus/releases/download/v9.2.0/EnergyPlus-9.2.0-921312fa1d-Linux-x86_64.sh) | [EnergyPlus-9.2.0-921312fa1d-Darwin-x86_64.dmg](https://github.com/NREL/EnergyPlus/releases/download/v9.2.0/EnergyPlus-9.2.0-921312fa1d-Darwin-x86_64.dmg) |
+
+You can also download the installer at https://github.com/NREL/EnergyPlus/releases/.
 
 #### Ubuntu
 
 1. Go to the web page shown above.
-2. Right click
-   [EnergyPlus-9.1.0-08d2e308bb-Linux-x86_64.sh](https://github.com/NREL/EnergyPlus/releases/download/v9.1.0/EnergyPlus-9.1.0-08d2e308bb-Linux-x86_64.sh) and select `Save link As` to from the menu to download installation image.
-3. Apply patch on downloaded file (EnergyPlus 9.1.0 installation script unpacks in /usr/local instead of /usr/local/EnergyPlus-9.1.0)
+2. Right click on relevant link in supported versions table and select `Save link As` to from the menu to download installation image.
+3. (9.1.0, Linux only) Apply patch on downloaded file (EnergyPlus 9.1.0 installation script unpacks in /usr/local instead of /usr/local/EnergyPlus-9.1.0)
 ```
 $ cd <DOWNLOAD-DIRECTORY>
 $ patch -p0 < rl-testbed-for-energyplus/EnergyPlus/EnergyPlus-9.1.0-08d2e308bb-Linux-x86_64.sh.patch
 ```
-4. Execute installation image.
+4. Execute installation image. Below example is for EnergyPlus 9.1.0
 ```
 $ sudo bash <DOWNLOAD-DIRECTORY>/EnergyPlus-9.1.0-08d2e308bb-Linux-x86_64.sh
 ```
+
 Enter your admin password if required.
 Specify `/usr/local` for install directory.
 Respond with `/usr/local/bin` if asked for symbolic link location.
-The package will be installed at `/usr/local/EnergyPlus-9-1-0`.
+The package will be installed at `/usr/local/EnergyPlus-<EPLUS_VERSION>`.
 
 #### macOS
 
 1. Go to the web page shown above.
-2. Right click
-   [EnergyPlus-9.1.0-08d2e308bb-Darwin-x86_64.dmg](https://github.com/NREL/EnergyPlus/releases/download/v9.1.0/EnergyPlus-9.1.0-08d2e308bb-Darwin-x86_64.dmg) and select Save link As` to from the menu to download installation image.
+2. Right click in supported versions table and select `Save link As` to from the menu to download installation image.
 3. Double click the downloaded package, and follow the instructions.
-The package will be installed in `/Applications/EnergyPlus-9-1-0`.
+The package will be installed in `/Applications/EnergyPlus-<EPLUS_VERSION>`.
 
 ### Build patched EnergyPlus
 
-Download source code of EnergyPlus and rl-testbed-for-energyplus.
+Download source code of EnergyPlus and rl-testbed-for-energyplus. In below scripted lines, replace `<EPLUS_VERSION>`
+by the one you're using (for instance, `9.2.0`)
 
 ```
 $ cd <WORKING-DIRECTORY>
-$ git clone -b v9.1.0 git@github.com:NREL/EnergyPlus.git
+$ git clone -b v<EPLUS_VERSION> git@github.com:NREL/EnergyPlus.git
 $ git clone git@github.com:ibm/rl-testbed-for-energyplus.git
 ```
 
-Apply patch to EnergyPlus and build.
+Apply patch to EnergyPlus and build. Replace `<EPLUS_VERSION>`
+by the one you're using (for instance, `9-2-0`)
 
 ```
 $ cd <WORKING-DIRECTORY>/EnergyPlus
-$ patch -p1 < ../rl-testbed-for-energyplus/EnergyPlus/RL-patch-for-EnergyPlus-9-1-0.patch
+$ patch -p1 < ../rl-testbed-for-energyplus/EnergyPlus/RL-patch-for-EnergyPlus-<EPLUS_VERSION>.patch
 $ mkdir build
 $ cd build
-$ cmake -DCMAKE_INSTALL_PREFIX=/usr/local/EnergyPlus-9-1-0 ..    # Ubuntu case
-$ cmake -DCMAKE_INSTALL_PREFIX=/Applications/EnergyPlus-9-1-0 .. # macOS case
+$ cmake -DCMAKE_INSTALL_PREFIX=/usr/local/EnergyPlus-<EPLUS_VERSION> ..    # Ubuntu case
+$ cmake -DCMAKE_INSTALL_PREFIX=/Applications/EnergyPlus-<EPLUS_VERSION> .. # macOS case
 $ make -j4
 ```
 
@@ -89,7 +99,8 @@ $ pip3 install baselines
 ## How to run
 
 ### Set up
-Some environment variables must be defined.
+
+Some environment variables must be defined. `ENERGYPLUS_VERSION` must be adapted to your version.
 
 In `$(HOME)/.bashrc`
 ```
