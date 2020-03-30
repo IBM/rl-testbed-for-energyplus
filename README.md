@@ -10,6 +10,8 @@ The project's [maintainers](MAINTAINERS.txt): are responsible for reviewing and 
 ## Supported platforms
 We have tested on the following platforms.
 - macOS High Sierra (Version 10.13.6)
+- macOS Catalina (Version 10.15.3)
+  - baselines 0.1.5, gym 0.10.8, tensorflow 1.15.2
 - Ubuntu 16.04.2 LTS, 18.04.2 LTS
 
 ## Installation
@@ -105,19 +107,21 @@ Some environment variables must be defined. `ENERGYPLUS_VERSION` must be adapted
 In `$(HOME)/.bashrc`
 ```
 # Specify the top directory
-TOP=SOMEWHERE/rl-testbed-for-energyplus
+TOP=<DOWNLOAD-DIRECTORY>/rl-testbed-for-energyplus
 export PYTHONPATH=${PYTHONPATH}:${TOP}
-MODEL_DIR="${TOP}/EnergyPlus/Model"
 
 if [ `uname` == "Darwin" ]; then
 	energyplus_instdir="/Applications"
 else
 	energyplus_instdir="/usr/local"
 fi
-ENERGYPLUS_VERSION="9-1-0"
+ENERGYPLUS_VERSION="8-8-0"
+#ENERGYPLUS_VERSION="9-1-0"
+#ENERGYPLUS_VERSION="9-2-0"
 ENERGYPLUS_DIR="${energyplus_instdir}/EnergyPlus-${ENERGYPLUS_VERSION}"
 WEATHER_DIR="${ENERGYPLUS_DIR}/WeatherData"
 export ENERGYPLUS="${ENERGYPLUS_DIR}/energyplus"
+MODEL_DIR="${TOP}/EnergyPlus/Model-${ENERGYPLUS_VERSION}"
 
 # Weather file.
 # Single weather file or multiple weather files separated by comma character.
