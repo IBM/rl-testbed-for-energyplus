@@ -32,6 +32,7 @@ Supported EnergyPlus versions:
 | 8.8.0 | [EnergyPlus-8.8.0-7c3bbe4830-Linux-x86_64.sh](https://github.com/NREL/EnergyPlus/releases/download/v8.8.0/EnergyPlus-8.8.0-7c3bbe4830-Linux-x86_64.sh) | [EnergyPlus-8.8.0-7c3bbe4830-Darwin-x86_64.dmg](https://github.com/NREL/EnergyPlus/releases/download/v8.8.0/EnergyPlus-8.8.0-7c3bbe4830-Darwin-x86_64.dmg) |
 | 9.1.0 | [EnergyPlus-9.1.0-08d2e308bb-Linux-x86_64.sh](https://github.com/NREL/EnergyPlus/releases/download/v9.1.0/EnergyPlus-9.1.0-08d2e308bb-Linux-x86_64.sh) | [EnergyPlus-9.1.0-08d2e308bb-Darwin-x86_64.dmg](https://github.com/NREL/EnergyPlus/releases/download/v9.1.0/EnergyPlus-9.1.0-08d2e308bb-Darwin-x86_64.dmg) |
 | 9.2.0 | [EnergyPlus-9.2.0-921312fa1d-Linux-x86_64.sh](https://github.com/NREL/EnergyPlus/releases/download/v9.2.0/EnergyPlus-9.2.0-921312fa1d-Linux-x86_64.sh) | [EnergyPlus-9.2.0-921312fa1d-Darwin-x86_64.dmg](https://github.com/NREL/EnergyPlus/releases/download/v9.2.0/EnergyPlus-9.2.0-921312fa1d-Darwin-x86_64.dmg) |
+| 9.3.0 | [EnergyPlus-9.3.0-baff08990c-Linux-x86_64.sh](https://github.com/NREL/EnergyPlus/releases/download/v9.3.0/EnergyPlus-9.3.0-baff08990c-Linux-x86_64.sh) | [EnergyPlus-9.3.0-baff08990c-Darwin-x86_64.dmg](https://github.com/NREL/EnergyPlus/releases/download/v9.3.0/EnergyPlus-9.3.0-baff08990c-Darwin-x86_64.dmg) |
 
 You can also download the installer at https://github.com/NREL/EnergyPlus/releases/.
 
@@ -64,7 +65,7 @@ The package will be installed in `/Applications/EnergyPlus-<EPLUS_VERSION>`.
 ### Build patched EnergyPlus
 
 Download source code of EnergyPlus and rl-testbed-for-energyplus. In below scripted lines, replace `<EPLUS_VERSION>`
-by the one you're using (for instance, `9.2.0`)
+by the one you're using (for instance, `9.3.0`)
 
 ```
 $ cd <WORKING-DIRECTORY>
@@ -73,7 +74,7 @@ $ git clone git@github.com:ibm/rl-testbed-for-energyplus.git
 ```
 
 Apply patch to EnergyPlus and build. Replace `<EPLUS_VERSION>`
-by the one you're using (for instance, `9-2-0`)
+by the one you're using (for instance, `9-3-0`)
 
 ```
 $ cd <WORKING-DIRECTORY>/EnergyPlus
@@ -118,6 +119,7 @@ fi
 ENERGYPLUS_VERSION="8-8-0"
 #ENERGYPLUS_VERSION="9-1-0"
 #ENERGYPLUS_VERSION="9-2-0"
+#ENERGYPLUS_VERSION="9-3-0"
 ENERGYPLUS_DIR="${energyplus_instdir}/EnergyPlus-${ENERGYPLUS_VERSION}"
 WEATHER_DIR="${ENERGYPLUS_DIR}/WeatherData"
 export ENERGYPLUS="${ENERGYPLUS_DIR}/energyplus"
