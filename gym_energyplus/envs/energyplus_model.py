@@ -97,7 +97,7 @@ class EnergyPlusModel(metaclass=ABCMeta):
         return x_pos, x_labels
 
     def set_action(self, normalized_action):
-        # In TPRO/POP1/POP2 in baseline, action seems to be normalized to [-1.0, 1.0].
+        # In TRPO/PPO1/PPO2 in baseline, action distribution is a gaussian with mu = 0, sigma = 1
         # So it must be scaled back into action_space by the environment.
         self.action_prev = self.action
         self.action = self.action_space.low + (normalized_action + 1.) * 0.5 * (self.action_space.high - self.action_space.low)
