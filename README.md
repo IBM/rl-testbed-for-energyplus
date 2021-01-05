@@ -80,8 +80,8 @@ $ cd <WORKING-DIRECTORY>/EnergyPlus
 $ patch -p1 < ../rl-testbed-for-energyplus/EnergyPlus/RL-patch-for-EnergyPlus-<EPLUS_VERSION>.patch
 $ mkdir build
 $ cd build
-$ cmake -DCMAKE_INSTALL_PREFIX=/usr/local/EnergyPlus-<EPLUS_VERSION> ..    # Ubuntu case
-$ cmake -DCMAKE_INSTALL_PREFIX=/Applications/EnergyPlus-<EPLUS_VERSION> .. # macOS case
+$ cmake -DCMAKE_INSTALL_PREFIX=/usr/local/EnergyPlus-<EPLUS_VERSION> ..    # Ubuntu case (please don't forget the two dots at the end)
+$ cmake -DCMAKE_INSTALL_PREFIX=/Applications/EnergyPlus-<EPLUS_VERSION> .. # macOS case (please don't forget the two dots at the end)
 $ make -j4
 ```
 
