@@ -7,6 +7,8 @@ ARG RL_TESTBED_BRANCH=master
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+COPY bashrc_eplus /root/.bashrc_eplus
+
 WORKDIR /root
 
 RUN apt update && \
@@ -44,7 +46,8 @@ RUN apt install -y python3-mpi4py && \
     # - baselines 0.1.5 brings mujoco (not needed here), so we have to use 0.1.6 (which has no wheel, so from git)
     # - baselines requires tensorflow installed first
     cat requirements.txt | grep -v baselines | xargs pip3 install && \
-    cat requirements.txt | grep baselines | xargs pip3 install
+    cat requirements.txt | grep baselines | xargs pip3 install && \
+    echo "source .bashrc_eplus" >> /root/.bashrc
 
 # cleanup
 RUN rm -rf EnergyPlus && \
