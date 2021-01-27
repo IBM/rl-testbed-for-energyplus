@@ -21,7 +21,7 @@ RUN apt update && \
 RUN ssh-keyscan -H github.com >> /etc/ssh/ssh_known_hosts && \
     git clone --depth=1 -b v$EPLUS_VERSION https://github.com/NREL/EnergyPlus.git && \
     # get rl-testbed-for-energyplus sources
-    git clone --depth=1 -b $RL_TESTBED_BRANCH https://github.com/IBM/rl-testbed-for-energyplus.git ./rl-testbed-for-energyplus
+    git clone --depth=1 -b $RL_TESTBED_BRANCH https://github.com/antoine-galataud/rl-testbed-for-energyplus.git ./rl-testbed-for-energyplus
 
 WORKDIR /root/EnergyPlus
 
@@ -35,13 +35,20 @@ RUN patch -p1 < ../rl-testbed-for-energyplus/EnergyPlus/RL-patch-for-EnergyPlus-
 
 WORKDIR /root
 
-# free space, install python dependencies
+# install python dependencies
+RUN apt install -y python3-mpi4py && \
+    pip3 install -U pip && \
+    cd ./rl-testbed-for-energyplus && \
+    # installing deps in 2 steps:
+    # - baselines 0.1.5 brings mujoco (not needed here), so we have to use 0.1.6 (which has no wheel, so from git)
+    # - baselines requires tensorflow installed first, so have to make sure order is respected (not possible with -r)
+    cat requirements.txt | grep -v baselines | xargs pip3 install && \
+    cat requirements.txt | grep baselines | xargs pip3 install
+
+# cleanup
 RUN rm -rf EnergyPlus && \
     rm $(echo "$EPLUS_DL_URL" | rev | cut -d'/' -f1 | rev) && \
     apt remove -y build-essential cmake wget && \
-    apt autoremove -y && \
-    pip3 install -U pip && \
-    cd ./rl-testbed-for-energyplus && \
-    pip3 install -r requirements.txt
+    apt autoremove -y
 
 ENTRYPOINT "/bin/bash"
