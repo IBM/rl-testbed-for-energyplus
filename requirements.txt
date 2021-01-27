@@ -1,0 +1,7 @@
+numpy==1.18.4
+pandas==1.0.3
+scipy==1.6.0
+matplotlib==3.2.1
+gym==0.10.8
+baselines==0.1.5
+tensorflow==1.15.2
