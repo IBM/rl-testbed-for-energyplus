@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # noinspection PyUnresolvedReferences
+import sys
+
 from mpi4py import MPI
 from baselines_energyplus.common.energyplus_util import make_energyplus_env, energyplus_arg_parser, energyplus_logbase_dir
 from baselines import logger
@@ -27,11 +29,11 @@ def train(env_id, num_timesteps, seed):
     model = os.getenv('ENERGYPLUS_MODEL')
     if model is None:
         print('Environment variable ENERGYPLUS_MODEL is not defined')
-        os.exit()
+        sys.exit(1)
     weather = os.getenv('ENERGYPLUS_WEATHER')
     if weather is None:
         print('Environment variable ENERGYPLUS_WEATHER is not defined')
-        os.exit()
+        sys.exit(1)
 
     rank = MPI.COMM_WORLD.Get_rank()
     if rank == 0:
