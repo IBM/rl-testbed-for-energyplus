@@ -15,9 +15,10 @@ RUN apt update && \
     update-alternatives --install /usr/bin/python python /usr/bin/python3 1 && \
     # install E+ from binaries
     wget --quiet $EPLUS_DL_URL && \
-    (echo "y"; echo ""; echo "";) | bash $(echo "$EPLUS_DL_URL" | rev | cut -d'/' -f1 | rev) && \
-    # get E+ sources
-    ssh-keyscan -H github.com >> /etc/ssh/ssh_known_hosts && \
+    (echo "y"; echo ""; echo "";) | bash $(echo "$EPLUS_DL_URL" | rev | cut -d'/' -f1 | rev)
+
+# get E+ and rl-testbed-for-energyplussources
+RUN ssh-keyscan -H github.com >> /etc/ssh/ssh_known_hosts && \
     git clone --depth=1 -b v$EPLUS_VERSION https://github.com/NREL/EnergyPlus.git && \
     # get rl-testbed-for-energyplus sources
     git clone --depth=1 -b $RL_TESTBED_BRANCH https://github.com/IBM/rl-testbed-for-energyplus.git ./rl-testbed-for-energyplus
