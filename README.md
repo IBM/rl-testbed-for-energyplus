@@ -99,6 +99,11 @@ Python3 >= 3.5 is required.
 $ pip3 install -r requirements.txt
 ```
 
+Note on baselines dependency:
+
+- baselines 0.1.5 fails to install when MuJoCo can't be found. Reason why 0.1.6 is required (available from sources only)
+- if baselines 0.1.6 installation fails because TensorFlow is missing, install each tensorflow manually first, then retry.
+
 For more information on baselines requirements, see https://github.com/openai/baselines for details.
 
 ## How to run
