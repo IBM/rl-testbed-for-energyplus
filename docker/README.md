@@ -24,9 +24,17 @@ docker build . \
 
 ### Running
 
-The image can be used to run a training as it contains all necessary dependencies. For example, if you want to use 
-your own project sources to launch a training, you can first start docker image with project sources mounted as a 
-container volume:
+The image can be used to run a training as it contains all necessary dependencies. Run:
+
+```shell
+docker run -t -i rl-testbed-for-energyplus
+```
+
+to start the container and open a shell. Then `cd /root/rl-testbed-for-energyplus`, there you can launch a training as 
+documented in README.md.
+
+Another option is to use your own project sources to launch a training (e.g. you have forked present git repo). To do 
+so, you can start docker image with your project sources mounted as a container volume:
 
 ```shell
 docker run -t -i -v /path/to/project:/root/my-project rl-testbed-for-energyplus
@@ -34,6 +42,5 @@ docker run -t -i -v /path/to/project:/root/my-project rl-testbed-for-energyplus
 
 Tip: simply use `$(pwd)` instead of `/path/to/project` if you want to mount the current directory.
 
-This starts the container and opens a `bash` shell. Then you can launch a training as documented in README.md at the root 
-of this project. All modifications you will make to your sources located on your hard drive will be reflected in running 
+Note: all modifications you will make to your sources located on your hard drive will be reflected in the running 
 docker container.
