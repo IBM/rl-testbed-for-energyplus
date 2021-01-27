@@ -10,7 +10,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /root
 
 RUN apt update && \
-    apt install -y -u build-essential cmake python3-minimal python3-pip wget openssh-client git && \
+    apt install -y -u build-essential cmake python3-minimal python3-pip wget openssh-client git \
+                      libgl1-mesa-glx && \
     # necessary so cmake can find python binary
     update-alternatives --install /usr/bin/python python /usr/bin/python3 1 && \
     # install E+ from binaries
@@ -41,7 +42,7 @@ RUN apt install -y python3-mpi4py && \
     cd ./rl-testbed-for-energyplus && \
     # installing deps in 2 steps:
     # - baselines 0.1.5 brings mujoco (not needed here), so we have to use 0.1.6 (which has no wheel, so from git)
-    # - baselines requires tensorflow installed first, so have to make sure order is respected (not possible with -r)
+    # - baselines requires tensorflow installed first
     cat requirements.txt | grep -v baselines | xargs pip3 install && \
     cat requirements.txt | grep baselines | xargs pip3 install
 
