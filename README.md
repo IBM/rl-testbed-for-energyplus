@@ -90,13 +90,16 @@ $ make -j4
 $ sudo make install
 ```
 
-### Install OpenAI Gym and OpenAI Baselines
-See https://github.com/openai/baselines for details.
+### Install Python dependencies
+
+
+Python3 >= 3.5 is required.
 
 ```
-$ pip3 install gym
-$ pip3 install baselines
+$ pip3 install -r requirements.txt
 ```
+
+For more information on baselines requirements, see https://github.com/openai/baselines for details.
 
 ## How to run
 
