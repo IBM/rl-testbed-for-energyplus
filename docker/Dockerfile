@@ -24,7 +24,7 @@ RUN apt update && \
 RUN ssh-keyscan -H github.com >> /etc/ssh/ssh_known_hosts && \
     git clone --depth=1 -b v$EPLUS_VERSION https://github.com/NREL/EnergyPlus.git && \
     # get rl-testbed-for-energyplus sources
-    git clone --depth=1 -b $RL_TESTBED_BRANCH https://github.com/antoine-galataud/rl-testbed-for-energyplus.git ./rl-testbed-for-energyplus
+    git clone --depth=1 -b $RL_TESTBED_BRANCH https://github.com/IBM/rl-testbed-for-energyplus.git ./rl-testbed-for-energyplus
 
 WORKDIR /root/EnergyPlus
 
