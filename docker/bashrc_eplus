@@ -8,7 +8,9 @@ else
 	energyplus_instdir="/usr/local"
 fi
 
-ENERGYPLUS_VERSION="9-2-0"
+
+# deduce EnergyPlus version from its installation directory
+ENERGYPLUS_VERSION="$(ls -d ${energyplus_instdir}/EnergyPlus* |  cut -d'-' -f2-4)"
 ENERGYPLUS_DIR="${energyplus_instdir}/EnergyPlus-${ENERGYPLUS_VERSION}"
 WEATHER_DIR="${ENERGYPLUS_DIR}/WeatherData"
 export ENERGYPLUS="${ENERGYPLUS_DIR}/energyplus"
