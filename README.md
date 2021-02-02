@@ -103,7 +103,7 @@ Main dependencies:
 
 - tensorflow 1.15
 - baselines 0.1.6
-- gym 0.18.0
+- gym 0.15.7
 
 Note on baselines dependency:
 
