@@ -1,5 +1,5 @@
 diff --git a/src/EnergyPlus/CMakeLists.txt b/src/EnergyPlus/CMakeLists.txt
-index 2bc0b77e5..64dd5568c 100644
+index 2bc0b77..64dd556 100644
 --- a/src/EnergyPlus/CMakeLists.txt
 +++ b/src/EnergyPlus/CMakeLists.txt
 @@ -207,6 +207,8 @@ SET( SRC
@@ -12,7 +12,7 @@ index 2bc0b77e5..64dd5568c 100644
    ExteriorEnergyUse.hh
    ExternalInterface.cc
 diff --git a/src/EnergyPlus/DataRuntimeLanguage.cc b/src/EnergyPlus/DataRuntimeLanguage.cc
-index 780ec3a22..2435ef6d2 100644
+index 780ec3a..2435ef6 100644
 --- a/src/EnergyPlus/DataRuntimeLanguage.cc
 +++ b/src/EnergyPlus/DataRuntimeLanguage.cc
 @@ -177,7 +177,11 @@ namespace DataRuntimeLanguage {
@@ -29,7 +29,7 @@ index 780ec3a22..2435ef6d2 100644
  	// DERIVED TYPE DEFINITIONS:
  
 diff --git a/src/EnergyPlus/DataRuntimeLanguage.hh b/src/EnergyPlus/DataRuntimeLanguage.hh
-index 0eb73d9f2..c52a5152f 100644
+index 0eb73d9..c52a515 100644
 --- a/src/EnergyPlus/DataRuntimeLanguage.hh
 +++ b/src/EnergyPlus/DataRuntimeLanguage.hh
 @@ -175,6 +175,10 @@ namespace DataRuntimeLanguage {
@@ -44,7 +44,7 @@ index 0eb73d9f2..c52a5152f 100644
  
  	// DERIVED TYPE DEFINITIONS:
 diff --git a/src/EnergyPlus/EvaporativeCoolers.cc b/src/EnergyPlus/EvaporativeCoolers.cc
-index 6cc3c4a2c..19a1bf52a 100644
+index 6cc3c4a..19a1bf5 100644
 --- a/src/EnergyPlus/EvaporativeCoolers.cc
 +++ b/src/EnergyPlus/EvaporativeCoolers.cc
 @@ -2279,8 +2279,8 @@ namespace EvaporativeCoolers {
@@ -59,11 +59,10 @@ index 6cc3c4a2c..19a1bf52a 100644
  		// INTERFACE BLOCK SPECIFICATIONS
  		// na
 diff --git a/src/EnergyPlus/ExtCtrl.cc b/src/EnergyPlus/ExtCtrl.cc
-new file mode 100644
-index 000000000..32b87ac66
---- /dev/null
+index e69de29..69e43de 100644
+--- a/src/EnergyPlus/ExtCtrl.cc
 +++ b/src/EnergyPlus/ExtCtrl.cc
-@@ -0,0 +1,290 @@
+@@ -0,0 +1,301 @@
 +// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
 +// The Regents of the University of California, through Lawrence Berkeley National Laboratory
 +// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
@@ -126,6 +125,8 @@ index 000000000..32b87ac66
 +#include <CommandLineInterface.hh>
 +#include <ExtCtrl.hh>
 +#include <DataEnvironment.hh>
++#include <DataGlobals.hh>
++#include <DataHVACGlobals.hh>
 +#include <DataPrecisionGlobals.hh>
 +#include <General.hh>
 +#include <UtilityRoutines.hh>
@@ -157,6 +158,10 @@ index 000000000..32b87ac66
 +	// Data
 +	// MODULE PARAMETER DEFINITIONS:
 +	// For sending observation
++
++	using DataGlobals::TimeStepZone;
++	using DataHVACGlobals::TimeStepSys;
++	
 +	int const CMD_OBS_INIT( 0 );
 +	int const NUM_OBSS( 10 );
 +	int const CMD_OBS_INDEX_LOW( 1 );
@@ -311,7 +316,7 @@ index 000000000..32b87ac66
 +	)
 +	{
 +		Int64 cmdInt = cmd;
-+		Int64 ArgInt = arg;
++		Int64 argInt = arg;
 +
 +		if (InitializeExtCtrlRoutines()) {
 +			return -1.0;
@@ -321,13 +326,18 @@ index 000000000..32b87ac66
 +			return acts[cmdInt - 1];
 +		}
 +		else if (cmdInt == CMD_ACT_REQ ) {
-+			if ( !(ArgInt >= 0 && ArgInt <= CMD_ACT_INDEX_HIGH) ) {
-+				ShowWarningMessage( "ExtCtrlAct: Number of obss " + std::to_string( ArgInt ) + " must be in range [0..." + std::to_string( CMD_ACT_INDEX_HIGH ) + "]" );
++			if ( !(argInt >= 0 && argInt <= CMD_ACT_INDEX_HIGH) ) {
++				ShowWarningMessage( "ExtCtrlAct: Number of obss " + std::to_string( argInt ) + " must be in range [0..." + std::to_string( CMD_ACT_INDEX_HIGH ) + "]" );
 +				return -1.0;
 +			}
++			// skip system timestep
++			if (TimeStepSys < TimeStepZone) {
++				return 0.0;
++				}
++
 +			// Send observation data to the server, and receive next action.
-+			ExtCtrlWrite(std::to_string(ArgInt));
-+			for (int i = CMD_ACT_INDEX_LOW; i <= ArgInt; i++) {
++			ExtCtrlWrite(std::to_string(argInt));
++			for (int i = CMD_ACT_INDEX_LOW; i <= argInt; i++) {
 +				ExtCtrlWrite(std::to_string(obss[i - 1]));
 +			}
 +			ExtCtrlFlush();
@@ -355,9 +365,8 @@ index 000000000..32b87ac66
 +
 +} // EnergyPlus
 diff --git a/src/EnergyPlus/ExtCtrl.hh b/src/EnergyPlus/ExtCtrl.hh
-new file mode 100644
-index 000000000..4cb33b69b
---- /dev/null
+index e69de29..4cb33b6 100644
+--- a/src/EnergyPlus/ExtCtrl.hh
 +++ b/src/EnergyPlus/ExtCtrl.hh
 @@ -0,0 +1,129 @@
 +// EnergyPlus, Copyright (c) 1996-2017, The Board of Trustees of the University of Illinois,
@@ -490,7 +499,7 @@ index 000000000..4cb33b69b
 +
 +#endif
 diff --git a/src/EnergyPlus/RuntimeLanguageProcessor.cc b/src/EnergyPlus/RuntimeLanguageProcessor.cc
-index 8530471f7..53afa1e1a 100644
+index 8530471..53afa1e 100644
 --- a/src/EnergyPlus/RuntimeLanguageProcessor.cc
 +++ b/src/EnergyPlus/RuntimeLanguageProcessor.cc
 @@ -73,6 +73,7 @@
