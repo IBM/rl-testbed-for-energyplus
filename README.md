@@ -11,7 +11,6 @@ The project's [maintainers](MAINTAINERS.txt): are responsible for reviewing and 
 We have tested on the following platforms.
 - macOS High Sierra (Version 10.13.6)
 - macOS Catalina (Version 10.15.3)
-  - baselines 0.1.5, gym 0.10.8, tensorflow 1.15.2
 - Ubuntu 16.04.2 LTS, 18.04.2 LTS
 
 ## Installation
@@ -91,13 +90,27 @@ $ make -j4
 $ sudo make install
 ```
 
-### Install OpenAI Gym and OpenAI Baselines
-See https://github.com/openai/baselines for details.
+### Install Python dependencies
+
+
+Python3 >= 3.5 is required.
 
 ```
-$ pip3 install gym
-$ pip3 install baselines
+$ pip3 install -r requirements.txt
 ```
+
+Main dependencies:
+
+- tensorflow 1.15
+- baselines 0.1.6
+- gym 0.15.7
+
+Note on baselines dependency:
+
+- baselines 0.1.5 fails to install when MuJoCo can't be found. Reason why 0.1.6 is required (available from sources only)
+- if baselines 0.1.6 installation fails because TensorFlow is missing, install tensorflow manually first, then retry.
+
+For more information on baselines requirements, see https://github.com/openai/baselines for details.
 
 ## How to run
 

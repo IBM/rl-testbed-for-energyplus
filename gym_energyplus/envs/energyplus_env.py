@@ -182,6 +182,9 @@ class EnergyPlusEnv(Env):
         self.timestep1 += 1
         # Send action to the environment
         if action is not None:
+            # baselines 0.1.6 changed action type
+            if isinstance(action, np.ndarray) and isinstance(action[0], np.ndarray):
+                action = action[0]
             self.ep_model.set_action(action)
 
             if not self.send_action():
