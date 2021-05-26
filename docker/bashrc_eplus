@@ -1,0 +1,34 @@
+# Specify the top directory
+TOP=/root/rl-testbed-for-energyplus
+export PYTHONPATH=${PYTHONPATH}:${TOP}
+
+if [ `uname` == "Darwin" ]; then
+	energyplus_instdir="/Applications"
+else
+	energyplus_instdir="/usr/local"
+fi
+
+
+# deduce EnergyPlus version from its installation directory
+ENERGYPLUS_VERSION="$(ls -d ${energyplus_instdir}/EnergyPlus* |  cut -d'-' -f2-4)"
+ENERGYPLUS_DIR="${energyplus_instdir}/EnergyPlus-${ENERGYPLUS_VERSION}"
+WEATHER_DIR="${ENERGYPLUS_DIR}/WeatherData"
+export ENERGYPLUS="${ENERGYPLUS_DIR}/energyplus"
+MODEL_DIR="${TOP}/EnergyPlus/Model-${ENERGYPLUS_VERSION}"
+
+# Weather file.
+# Single weather file or multiple weather files separated by comma character.
+export ENERGYPLUS_WEATHER="${WEATHER_DIR}/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+#export ENERGYPLUS_WEATHER="${WEATHER_DIR}/USA_CO_Golden-NREL.724666_TMY3.epw"
+#export ENERGYPLUS_WEATHER="${WEATHER_DIR}/USA_FL_Tampa.Intl.AP.722110_TMY3.epw"
+#export ENERGYPLUS_WEATHER="${WEATHER_DIR}/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw"
+#export ENERGYPLUS_WEATHER="${WEATHER_DIR}/USA_VA_Sterling-Washington.Dulles.Intl.AP.724030_TMY3.epw"
+#export ENERGYPLUS_WEATHER="${WEATHER_DIR}/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw,${WEATHER_DIR}/USA_CO_Golden-NREL.724666_TMY3.epw,${WEATHER_DIR}/USA_FL_Tampa.Intl.AP.722110_TMY3.epw"
+
+# Ouput directory "openai-YYYY-MM-DD-HH-MM-SS-mmmmmm" is created in
+# the directory specified by ENERGYPLUS_LOGBASE or in the current directory if not specified.
+export ENERGYPLUS_LOGBASE="${HOME}/eplog"
+
+# Model file. Uncomment one.
+#export ENERGYPLUS_MODEL="${MODEL_DIR}/2ZoneDataCenterHVAC_wEconomizer_Temp.idf"     # Temp. setpoint control
+export ENERGYPLUS_MODEL="${MODEL_DIR}/2ZoneDataCenterHVAC_wEconomizer_Temp_Fan.idf" # Temp. setpoint and fan control
