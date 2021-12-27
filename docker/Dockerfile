@@ -1,5 +1,5 @@
-ARG EPLUS_VERSION=9-5-0
-ARG EPLUS_DL_URL=https://github.com/NREL/EnergyPlus/releases/download/v9.5.0/EnergyPlus-9.5.0-de239b2e5f-Linux-Ubuntu18.04-x86_64.sh
+ARG EPLUS_VERSION=9-2-0
+ARG EPLUS_DL_URL=https://github.com/NREL/EnergyPlus/releases/download/v9.2.0/EnergyPlus-9.2.0-921312fa1d-Linux-x86_64.sh
 
 # Stage 1
 FROM ubuntu:18.04 AS eplus-build
