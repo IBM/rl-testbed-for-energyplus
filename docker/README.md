@@ -5,19 +5,22 @@ environment.
 
 ### Building
 
-You need `docker` installed. Present procedure was built and tested on Ubuntu 18.04.
+You need `docker` installed (ie `sudo apt install docker.io`).
+
+Present procedure was built and tested on Ubuntu 18.04 LTS and 20.04 LTS.
 
 Build image with:
 
 ```shell
-docker build . -t rl-testbed-for-energyplus
+cd rl-testbed-for-energyplus/
+docker build . -f docker/Dockerfile -t rl-testbed-for-energyplus
 ```
 
-The default EnergyPlus version used in the image is `9.2.0`. To use a different one, follow example below:
+The default EnergyPlus version used in the image is `9-5-0`. To use a different one, follow example below:
 
 ```shell
 docker build . \
-  --build-arg EPLUS_VERSION=8.8.0 \
+  --build-arg EPLUS_VERSION=9-4-0 \
   --build-arg EPLUS_DL_URL="<EnergyPlus download URL>" \
   -t rl-testbed-for-energyplus
 ```
