@@ -1,3 +1,5 @@
 Maintainers
 
 Takao Moriyama moriyama@jp.ibm.com
+Mich Tatsubori mich@jp.ibm.com
+Antoine Galataud antoine.galataud@gmail.com
