@@ -11,9 +11,9 @@ import os
 import datetime
 
 def train(env_id, num_timesteps, seed):
-    import baselines.common.tf_util as U
-    sess = U.single_threaded_session()
-    sess.__enter__()
+    # import baselines.common.tf_util as U
+    # sess = U.single_threaded_session()
+    # sess.__enter__()
     workerseed = seed + 10000 * MPI.COMM_WORLD.Get_rank()
 
     # Create a new base directory like /tmp/openai-2018-05-21-12-27-22-552435
