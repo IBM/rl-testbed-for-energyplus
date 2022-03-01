@@ -3557,13 +3557,6 @@
   EnergyManagementSystem:Program,
     ExtCtrlBasedSetpointManager,  !- Name
     IF WarmupFlag == 0.0,    !- Program Line 1
-    SET tmp_val1 = @ExtCtrlObs 1 OutdoorTemp,  !- Program Line 2
-    SET tmp_val1 = @ExtCtrlObs 2 WestZoneTemp,  !- <none>
-    SET tmp_val1 = @ExtCtrlObs 3 EastZoneTemp,  !- <none>
-    SET tmp_val1 = @ExtCtrlObs 4 PUE_Value,  !- <none>
-    SET tmp_val1 = @ExtCtrlObs 5 Whole_Building_Power,  !- <none>
-    SET tmp_val1 = @ExtCtrlObs 6 IT_Equip_Power,  !- <none>
-    SET tmp_val1 = @ExtCtrlObs 7 Whole_HVAC_Power,  !- <none>
     SET tmp_val1 = @ExtCtrlAct 0 7,  !- <none>
     SET WestZoneDECOutletNode_setpoint = @ExtCtrlAct 1,  !- <none>
     SET WestZoneIECOutletNode_setpoint = @ExtCtrlAct 1,  !- <none>
@@ -3584,3 +3577,20 @@
     SET EastAirLoopOutletNode_setpoint = 10,  !- <none>
     ENDIF;                   !- <none>
 
+  EnergyManagementSystem:ProgramCallingManager,
+    ExtCtrl-Based Observation Collector,  !- Name
+    EndOfZoneTimestepAfterZoneReporting,  !- EnergyPlus Model Calling Point
+    ExtCtrlBasedObservationCollector;     !- Program Name 1
+
+  EnergyManagementSystem:Program,
+    ExtCtrlBasedObservationCollector,  !- Name
+    IF WarmupFlag == 0.0,    !- Program Line 1
+    SET tmp_val1 = @ExtCtrlObs 1 OutdoorTemp,  !- Program Line 2
+    SET tmp_val1 = @ExtCtrlObs 2 WestZoneTemp,  !- <none>
+    SET tmp_val1 = @ExtCtrlObs 3 EastZoneTemp,  !- <none>
+    SET tmp_val1 = @ExtCtrlObs 4 PUE_Value,  !- <none>
+    SET tmp_val1 = @ExtCtrlObs 5 Whole_Building_Power,  !- <none>
+    SET tmp_val1 = @ExtCtrlObs 6 IT_Equip_Power,  !- <none>
+    SET tmp_val1 = @ExtCtrlObs 7 Whole_HVAC_Power,  !- <none>
+    ELSE,                    !- <none>
+    ENDIF;                   !- <none>
