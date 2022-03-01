@@ -2993,7 +2993,7 @@
   ElectricEquipment:ITE:AirCooled,
     EastDataCenter_Equip,    !- Name
     East Zone,               !- Zone Name
-    FlowControlWithApproachTemperatures,  !- Air Flow Calculation Method
+    FlowFromSystem,          !- Air Flow Calculation Method
     Watts/Area,              !- Design Power Input Calculation Method
     ,                        !- Watts per Unit {W}
     ,                        !- Number of Units
@@ -3019,9 +3019,9 @@
     ITE-CPU,                 !- CPU End-Use Subcategory
     ITE-Fans,                !- Fan End-Use Subcategory
     ITE-UPS,                 !- Electric Power Supply End-Use Subcategory
-    2,                       !- Supply Temperature Difference {deltaC}
+    ,                        !- Supply Temperature Difference {deltaC}
     ,                        !- Supply Temperature Difference Schedule
-    0,                       !- Return Temperature Difference {deltaC}
+    ,                        !- Return Temperature Difference {deltaC}
     ;                        !- Return Temperature Difference Schedule
 
   Schedule:Compact,
