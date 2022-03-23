@@ -1,8 +1,8 @@
-ARG EPLUS_VERSION=9-2-0
-ARG EPLUS_DL_URL=https://github.com/NREL/EnergyPlus/releases/download/v9.2.0/EnergyPlus-9.2.0-921312fa1d-Linux-x86_64.sh
+ARG EPLUS_VERSION=9-5-0
+ARG EPLUS_DL_URL=https://github.com/NREL/EnergyPlus/releases/download/v9.5.0/EnergyPlus-9.5.0-de239b2e5f-Linux-Ubuntu20.04-x86_64.sh
 
 # Stage 1
-FROM ubuntu:18.04 AS eplus-build
+FROM ubuntu:20.04 AS eplus-build
 
 ARG EPLUS_VERSION
 ARG EPLUS_DL_URL
@@ -16,8 +16,6 @@ WORKDIR /root
 
 RUN apt update && \
     apt install -y -u build-essential cmake python3-minimal wget openssh-client git libgl1-mesa-glx && \
-    # necessary so cmake can find python binary
-    update-alternatives --install /usr/bin/python python /usr/bin/python3 1 && \
     # install EnergyPlus from binaries
     wget --quiet $EPLUS_DL_URL && \
     (echo "y"; echo ""; echo "";) | bash $(echo "$EPLUS_DL_URL" | rev | cut -d'/' -f1 | rev) && \
@@ -33,7 +31,7 @@ RUN apt update && \
     make install
 
 # Stage 2
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 ARG EPLUS_VERSION
 
@@ -58,8 +56,8 @@ RUN export EPLUS_INSTALL_PATH=/usr/local/EnergyPlus-${EPLUS_VERSION} && \
     apt update && apt install -y locales python3-pip python3-mpi4py git libgl1-mesa-glx && \
     pip3 install -U pip && \
     # installing deps in 2 steps:
-    # - baselines 0.1.5 brings mujoco (not needed here), so we have to use 0.1.6 (which has no wheel, so from git)
     # - baselines requires tensorflow installed first
+    # - we need baselines to support tf2, which is only available in a git branch
     cd /root/rl-testbed-for-energyplus && \
     cat requirements.txt | grep -v baselines | xargs pip3 install && \
     cat requirements.txt | grep baselines | xargs pip3 install && \
