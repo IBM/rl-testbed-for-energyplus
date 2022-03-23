@@ -1,7 +1,0 @@
-
-Conversion 9.4 => 9.5
- Starting new Transition.audit
- Will create new full IDFs
- Will create new IDF lines with units where applicable
- Will create new IDF lines leaving blank incoming fields as blank (no default fill)
- Processing IDF -- /home/antoine/git/rl-testbed-for-energyplus/EnergyPlus/Model-9-5-0/2ZoneDataCenterHVAC_wEconomizer_Temp.idf
