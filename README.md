@@ -122,7 +122,6 @@ Older versions:
 To run on Ubuntu 18.04, you'll need the following pip dependencies (edit `requirements.txt`):
 
 ```
-numpy==1.19.5
 scipy==1.5.4
 tensorflow==1.15.4
 ```
