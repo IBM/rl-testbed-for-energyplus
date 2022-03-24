@@ -1,6 +1,7 @@
 # Specify the top directory
 TOP=/root/rl-testbed-for-energyplus
-export PYTHONPATH=${PYTHONPATH}:${TOP}
+# OpenAI baselines is installed from sources
+export PYTHONPATH=${PYTHONPATH}:${TOP}:/root/src/baselines
 energyplus_instdir="/usr/local"
 
 # deduce EnergyPlus version from its installation directory
