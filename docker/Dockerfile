@@ -34,6 +34,7 @@ RUN apt update && \
 FROM ubuntu:20.04
 
 ARG EPLUS_VERSION
+ENV DEBIAN_FRONTEND=noninteractive
 
 SHELL ["/bin/bash", "-c"]
 
@@ -53,13 +54,15 @@ RUN export EPLUS_INSTALL_PATH=/usr/local/EnergyPlus-${EPLUS_VERSION} && \
     ln -s ${EPLUS_INSTALL_PATH}/ExpandObjects /usr/local/bin/ExpandObjects && \
     ln -s ${EPLUS_INSTALL_PATH}/ReadVarsESO /usr/local/bin/ReadVarsESO && \
     # install python dependencies
-    apt update && apt install -y locales python3-pip python3-mpi4py git libgl1-mesa-glx && \
+    apt update && apt install -y locales python3-pip python3-mpi4py git libgl1-mesa-glx libglib2.0-0 && \
     pip3 install -U pip && \
     # installing deps in 2 steps:
     # - baselines requires tensorflow installed first
     # - we need baselines to support tf2, which is only available in a git branch
     cd /root/rl-testbed-for-energyplus && \
     cat requirements.txt | grep -v baselines | xargs pip3 install && \
+    # install baselines sources in /root/src/baselines. They need to be added to PYTHONPATH
+    cd /root && \
     cat requirements.txt | grep baselines | xargs pip3 install && \
     echo "source /root/.bashrc_eplus" >> /root/.bashrc && \
     # cleanup
