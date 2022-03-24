@@ -1,16 +1,11 @@
 # Specify the top directory
 TOP=/root/rl-testbed-for-energyplus
-export PYTHONPATH=${PYTHONPATH}:${TOP}
-
-if [ `uname` == "Darwin" ]; then
-	energyplus_instdir="/Applications"
-else
-	energyplus_instdir="/usr/local"
-fi
-
+# OpenAI baselines is installed from sources
+export PYTHONPATH=${PYTHONPATH}:${TOP}:/root/src/baselines
+energyplus_instdir="/usr/local"
 
 # deduce EnergyPlus version from its installation directory
-ENERGYPLUS_VERSION="$(ls -d ${energyplus_instdir}/EnergyPlus* |  cut -d'-' -f2-4)"
+ENERGYPLUS_VERSION="$(ls -d ${energyplus_instdir}/EnergyPlus* | cut -d'-' -f2-4)"
 ENERGYPLUS_DIR="${energyplus_instdir}/EnergyPlus-${ENERGYPLUS_VERSION}"
 WEATHER_DIR="${ENERGYPLUS_DIR}/WeatherData"
 export ENERGYPLUS="${ENERGYPLUS_DIR}/energyplus"

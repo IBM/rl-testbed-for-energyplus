@@ -8,19 +8,22 @@ We welcome contributions to this project in many forms. There's always plenty to
 The project's [maintainers](MAINTAINERS.txt): are responsible for reviewing and merging all pull requests and they guide the over-all technical direction of the project.
 
 ## Supported platforms
+
 We have tested on the following platforms.
 - macOS High Sierra (Version 10.13.6)
 - macOS Catalina (Version 10.15.3)
-- Ubuntu 16.04.2 LTS, 18.04.2 LTS
+- Ubuntu 20.04 LTS
 
 ## Installation
-Installaton of rl-testbed-for-energyplus consists of three parts:
 
-- Intall EnergyPlus prebuild package
+Installation of rl-testbed-for-energyplus consists of three parts:
+
+- Install EnergyPlus prebuilt package
 - Build patched EnergyPlus
 - Install built executables
 
 ### Install EnergyPlus prebuilt package
+
 First, download pre-built package of EnergyPlus and install it.
 This is not for executing normal version of EnergyPlus, but to get some pre-compiled binaries and data files that can not be generated from source code.
 
@@ -32,6 +35,8 @@ Supported EnergyPlus versions:
 | 9.1.0 | [EnergyPlus-9.1.0-08d2e308bb-Linux-x86_64.sh](https://github.com/NREL/EnergyPlus/releases/download/v9.1.0/EnergyPlus-9.1.0-08d2e308bb-Linux-x86_64.sh) | [EnergyPlus-9.1.0-08d2e308bb-Darwin-x86_64.dmg](https://github.com/NREL/EnergyPlus/releases/download/v9.1.0/EnergyPlus-9.1.0-08d2e308bb-Darwin-x86_64.dmg) |
 | 9.2.0 | [EnergyPlus-9.2.0-921312fa1d-Linux-x86_64.sh](https://github.com/NREL/EnergyPlus/releases/download/v9.2.0/EnergyPlus-9.2.0-921312fa1d-Linux-x86_64.sh) | [EnergyPlus-9.2.0-921312fa1d-Darwin-x86_64.dmg](https://github.com/NREL/EnergyPlus/releases/download/v9.2.0/EnergyPlus-9.2.0-921312fa1d-Darwin-x86_64.dmg) |
 | 9.3.0 | [EnergyPlus-9.3.0-baff08990c-Linux-x86_64.sh](https://github.com/NREL/EnergyPlus/releases/download/v9.3.0/EnergyPlus-9.3.0-baff08990c-Linux-x86_64.sh) | [EnergyPlus-9.3.0-baff08990c-Darwin-x86_64.dmg](https://github.com/NREL/EnergyPlus/releases/download/v9.3.0/EnergyPlus-9.3.0-baff08990c-Darwin-x86_64.dmg) |
+| 9.4.0 | [EnergyPlus-9.4.0-998c4b761e-Linux-Ubuntu20.04-x86_64.sh](https://github.com/NREL/EnergyPlus/releases/download/v9.4.0/EnergyPlus-9.4.0-998c4b761e-Linux-Ubuntu20.04-x86_64.sh) | [EnergyPlus-9.4.0-998c4b761e-Darwin-macOS10.15-x86_64.dmg](https://github.com/NREL/EnergyPlus/releases/download/v9.4.0/EnergyPlus-9.4.0-998c4b761e-Darwin-macOS10.15-x86_64.dmg) |
+| 9.5.0 | [EnergyPlus-9.5.0-de239b2e5f-Linux-Ubuntu20.04-x86_64.sh](https://github.com/NREL/EnergyPlus/releases/download/v9.5.0/EnergyPlus-9.5.0-de239b2e5f-Linux-Ubuntu20.04-x86_64.sh) | [EnergyPlus-9.5.0-de239b2e5f-Darwin-macOS11.2-arm64.dmg](https://github.com/NREL/EnergyPlus/releases/download/v9.5.0/EnergyPlus-9.5.0-de239b2e5f-Darwin-macOS11.2-arm64.dmg) |
 
 You can also download the installer at https://github.com/NREL/EnergyPlus/releases/.
 
@@ -101,7 +106,7 @@ $ pip3 install -r requirements.txt
 
 Main dependencies:
 
-- tensorflow 1.15
+- tensorflow 2.5
 - baselines 0.1.6
 - gym 0.15.7
 
@@ -111,6 +116,15 @@ Note on baselines dependency:
 - if baselines 0.1.6 installation fails because TensorFlow is missing, install tensorflow manually first, then retry.
 
 For more information on baselines requirements, see https://github.com/openai/baselines for details.
+
+Older versions:
+
+To run on Ubuntu 18.04, you'll need the following pip dependencies (edit `requirements.txt`):
+
+```
+scipy==1.5.4
+tensorflow==1.15.4
+```
 
 ## How to run
 
