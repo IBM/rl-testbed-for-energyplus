@@ -60,7 +60,7 @@ RUN export EPLUS_INSTALL_PATH=/usr/local/EnergyPlus-${EPLUS_VERSION} && \
     # - baselines requires tensorflow installed first
     # - we need baselines to support tf2, which is only available in a git branch
     cd /root/rl-testbed-for-energyplus && \
-    cat requirements.txt | grep -v baselines | xargs pip3 install && \
+    cat requirements.txt | grep -v baselines | xargs pip3 install --ignore-installed && \
     # install baselines sources in /root/src/baselines. They need to be added to PYTHONPATH
     cd /root && \
     cat requirements.txt | grep baselines | xargs pip3 install && \
