@@ -36,7 +36,7 @@ to start the container and open a shell. Then:
 ```shell
 cd /root/rl-testbed-for-energyplus
 # launch
-`time python3 -m baselines_energyplus.trpo_mpi.run_energyplus --num-timesteps 1000000000`
+time python3 -m baselines_energyplus.trpo_mpi.run_energyplus --num-timesteps 1000000000
 ```
 
 Another option is to use your own project sources to launch a training (e.g. you have forked present git repo). To do 
