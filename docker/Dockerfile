@@ -22,7 +22,7 @@ RUN apt update && \
     # EnergyPlus 9.6+ requires cmake 3.17
     wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add - && \
     apt-add-repository 'deb https://apt.kitware.com/ubuntu/ focal main' && \
-    apt update && apt install cmake && \
+    apt update && apt install -y cmake && \
     # install EnergyPlus from binaries
     wget --quiet $EPLUS_DL_URL && \
     (echo "y"; echo ""; echo "";) | bash $(echo "$EPLUS_DL_URL" | rev | cut -d'/' -f1 | rev) && \
