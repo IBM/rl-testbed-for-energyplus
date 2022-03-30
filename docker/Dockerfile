@@ -20,7 +20,7 @@ RUN apt update && \
       apt-transport-https ca-certificates gnupg software-properties-common \
       libxrandr-dev libxinerama-dev libxcursor-dev && \
     # EnergyPlus 9.6+ requires cmake 3.17
-    wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | sudo apt-key add - && \
+    wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add - && \
     apt-add-repository 'deb https://apt.kitware.com/ubuntu/ focal main' && \
     apt update && apt install cmake && \
     # install EnergyPlus from binaries
