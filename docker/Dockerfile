@@ -1,5 +1,5 @@
-ARG EPLUS_VERSION=9-5-0
-ARG EPLUS_DL_URL=https://github.com/NREL/EnergyPlus/releases/download/v9.5.0/EnergyPlus-9.5.0-de239b2e5f-Linux-Ubuntu20.04-x86_64.sh
+ARG EPLUS_VERSION=9-6-0
+ARG EPLUS_DL_URL=https://github.com/NREL/EnergyPlus/releases/download/v9.6.0/EnergyPlus-9.6.0-f420c06a69-Linux-Ubuntu20.04-x86_64.sh
 
 # Stage 1
 FROM ubuntu:20.04 AS eplus-build
@@ -15,7 +15,14 @@ COPY ./EnergyPlus /root/patches/
 WORKDIR /root
 
 RUN apt update && \
-    apt install -y -u build-essential cmake python3-minimal wget openssh-client git libgl1-mesa-glx && \
+    apt install -y -u \
+      build-essential python3-minimal wget openssh-client git libgl1-mesa-glx \
+      apt-transport-https ca-certificates gnupg software-properties-common \
+      libxrandr-dev libxinerama-dev libxcursor-dev && \
+    # EnergyPlus 9.6+ requires cmake 3.17
+    wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add - && \
+    apt-add-repository 'deb https://apt.kitware.com/ubuntu/ focal main' && \
+    apt update && apt install -y cmake && \
     # install EnergyPlus from binaries
     wget --quiet $EPLUS_DL_URL && \
     (echo "y"; echo ""; echo "";) | bash $(echo "$EPLUS_DL_URL" | rev | cut -d'/' -f1 | rev) && \

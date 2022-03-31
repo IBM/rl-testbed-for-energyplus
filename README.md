@@ -16,6 +16,9 @@ We have tested on the following platforms.
 
 ## Installation
 
+The easiest way to setup a training environment is to use the docker image. See instructions [here](docker/README.md).
+For manual installation, see below.
+
 Installation of rl-testbed-for-energyplus consists of three parts:
 
 - Install EnergyPlus prebuilt package

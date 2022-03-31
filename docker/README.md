@@ -14,11 +14,11 @@ cd rl-testbed-for-energyplus/
 docker build . -f docker/Dockerfile -t rl-testbed-for-energyplus
 ```
 
-The default EnergyPlus version used in the image is `9-5-0`. To use a different one, follow example below:
+The default EnergyPlus version used in the image is `9-6-0`. To use a different one, follow example below:
 
 ```shell
 docker build . \
-  --build-arg EPLUS_VERSION=9-4-0 \
+  --build-arg EPLUS_VERSION=9-5-0 \
   --build-arg EPLUS_DL_URL="<EnergyPlus download URL>" \
   -t rl-testbed-for-energyplus
 ```
