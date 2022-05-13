@@ -1,5 +1,5 @@
-ARG EPLUS_VERSION=9-6-0
-ARG EPLUS_DL_URL=https://github.com/NREL/EnergyPlus/releases/download/v9.6.0/EnergyPlus-9.6.0-f420c06a69-Linux-Ubuntu20.04-x86_64.sh
+ARG EPLUS_VERSION=22-1-0
+ARG EPLUS_DL_URL=https://github.com/NREL/EnergyPlus/releases/download/v22.1.0/EnergyPlus-22.1.0-ed759b17ee-Linux-Ubuntu20.04-x86_64.sh
 
 # Stage 1
 FROM ubuntu:20.04 AS eplus-build
@@ -39,6 +39,9 @@ RUN apt update && \
 
 # Stage 2
 FROM ubuntu:20.04
+
+# connect package with repo
+LABEL org.opencontainers.image.source=https://github.com/IBM/rl-testbed-for-energyplus
 
 ARG EPLUS_VERSION
 ENV DEBIAN_FRONTEND=noninteractive
