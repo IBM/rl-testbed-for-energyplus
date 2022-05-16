@@ -1,5 +1,5 @@
 diff --git a/src/EnergyPlus/CMakeLists.txt b/src/EnergyPlus/CMakeLists.txt
-index 8455cc0dbfa..69e995b9255 100644
+index 8455cc0dbf..69e995b925 100644
 --- a/src/EnergyPlus/CMakeLists.txt
 +++ b/src/EnergyPlus/CMakeLists.txt
 @@ -260,6 +260,8 @@ set(SRC
@@ -11,8 +11,60 @@ index 8455cc0dbfa..69e995b9255 100644
      ExhaustAirSystemManager.cc
      ExhaustAirSystemManager.hh
      ExteriorEnergyUse.cc
+diff --git a/src/EnergyPlus/Data/CommonIncludes.hh b/src/EnergyPlus/Data/CommonIncludes.hh
+index eeadd67115..0ce41c77a9 100644
+--- a/src/EnergyPlus/Data/CommonIncludes.hh
++++ b/src/EnergyPlus/Data/CommonIncludes.hh
+@@ -145,6 +145,7 @@
+ #include <EnergyPlus/EvaporativeCoolers.hh>
+ #include <EnergyPlus/EvaporativeFluidCoolers.hh>
+ #include <EnergyPlus/ExhaustAirSystemManager.hh>
++#include <EnergyPlus/ExtCtrl.hh>
+ #include <EnergyPlus/ExteriorEnergyUse.hh>
+ #include <EnergyPlus/ExternalInterface.hh>
+ #include <EnergyPlus/FanCoilUnits.hh>
+diff --git a/src/EnergyPlus/Data/EnergyPlusData.cc b/src/EnergyPlus/Data/EnergyPlusData.cc
+index fa57d19472..d30dabc788 100644
+--- a/src/EnergyPlus/Data/EnergyPlusData.cc
++++ b/src/EnergyPlus/Data/EnergyPlusData.cc
+@@ -113,6 +113,7 @@ EnergyPlusData::EnergyPlusData()
+     this->dataErrTracking = std::make_unique<ErrorTrackingData>();
+     this->dataEvapCoolers = std::make_unique<EvaporativeCoolersData>();
+     this->dataEvapFluidCoolers = std::make_unique<EvaporativeFluidCoolersData>();
++    this->dataExtCtrl = std::make_unique<ExtCtrlData>();
+     this->dataExteriorEnergyUse = std::make_unique<ExteriorEnergyUseData>();
+     this->dataExternalInterface = std::make_unique<ExternalInterfaceData>();
+     this->dataFanCoilUnits = std::make_unique<FanCoilUnitsData>();
+@@ -374,6 +375,7 @@ void EnergyPlusData::clear_state()
+     this->dataErrTracking->clear_state();
+     this->dataEvapCoolers->clear_state();
+     this->dataEvapFluidCoolers->clear_state();
++    this->dataExtCtrl->clear_state();
+     this->dataExteriorEnergyUse->clear_state();
+     this->dataExternalInterface->clear_state();
+     this->dataFanCoilUnits->clear_state();
+diff --git a/src/EnergyPlus/Data/EnergyPlusData.hh b/src/EnergyPlus/Data/EnergyPlusData.hh
+index 0b85efe73c..9d786610a4 100644
+--- a/src/EnergyPlus/Data/EnergyPlusData.hh
++++ b/src/EnergyPlus/Data/EnergyPlusData.hh
+@@ -129,6 +129,7 @@ struct EnvironmentData;
+ struct ErrorTrackingData;
+ struct EvaporativeCoolersData;
+ struct EvaporativeFluidCoolersData;
++struct ExtCtrlData;
+ struct ExteriorEnergyUseData;
+ struct ExternalInterfaceData;
+ struct FanCoilUnitsData;
+@@ -391,6 +392,7 @@ struct EnergyPlusData : BaseGlobalStruct
+     std::unique_ptr<ErrorTrackingData> dataErrTracking;
+     std::unique_ptr<EvaporativeCoolersData> dataEvapCoolers;
+     std::unique_ptr<EvaporativeFluidCoolersData> dataEvapFluidCoolers;
++    std::unique_ptr<ExtCtrlData> dataExtCtrl;
+     std::unique_ptr<ExteriorEnergyUseData> dataExteriorEnergyUse;
+     std::unique_ptr<ExternalInterfaceData> dataExternalInterface;
+     std::unique_ptr<FanCoilUnitsData> dataFanCoilUnits;
 diff --git a/src/EnergyPlus/DataRuntimeLanguage.hh b/src/EnergyPlus/DataRuntimeLanguage.hh
-index 31dd0fe8e84..41cef696329 100644
+index 31dd0fe8e8..41cef69632 100644
 --- a/src/EnergyPlus/DataRuntimeLanguage.hh
 +++ b/src/EnergyPlus/DataRuntimeLanguage.hh
 @@ -231,10 +231,12 @@ namespace DataRuntimeLanguage {
@@ -31,10 +83,10 @@ index 31dd0fe8e84..41cef696329 100644
  
 diff --git a/src/EnergyPlus/ExtCtrl.cc b/src/EnergyPlus/ExtCtrl.cc
 new file mode 100644
-index 00000000000..79b2001146f
+index 0000000000..4e53283cc2
 --- /dev/null
 +++ b/src/EnergyPlus/ExtCtrl.cc
-@@ -0,0 +1,295 @@
+@@ -0,0 +1,236 @@
 +// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 +// The Regents of the University of California, through Lawrence Berkeley National Laboratory
 +// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
@@ -105,6 +157,9 @@ index 00000000000..79b2001146f
 +#include <EnergyPlus/General.hh>
 +#include <EnergyPlus/UtilityRoutines.hh>
 +
++#include <array>
++#include <string>
++
 +namespace EnergyPlus {
 +
 +namespace ExtCtrl {
@@ -119,212 +174,150 @@ index 00000000000..79b2001146f
 +    // PURPOSE OF THIS MODULE:
 +    // This module provides a repository for suporting external control
 +
-+    // METHODOLOGY EMPLOYED:
-+    // na
-+
-+    // REFERENCES:
-+    // na
-+
-+    // OTHER NOTES:
-+    // na
-+
-+    // Data
-+    // MODULE PARAMETER DEFINITIONS:
-+    // For sending observation
-+
-+    int const CMD_OBS_INIT(0);
-+    int const NUM_OBSS(100);
-+    int const CMD_OBS_INDEX_LOW(1);
-+    int const CMD_OBS_INDEX_HIGH(NUM_OBSS);
-+    Real64 obss[NUM_OBSS];
-+    Real64 const OBS_DATA_NULL(-123.0);
-+
-+    // For receiving action
-+    int const CMD_ACT_REQ(0);
-+    int const NUM_ACTS(100);
-+    int const CMD_ACT_INDEX_LOW(1);
-+    int const CMD_ACT_INDEX_HIGH(NUM_ACTS);
-+    Real64 acts[NUM_ACTS];
-+    Real64 const ACT_DATA_NULL(-456.0);
-+
-+    std::string const blank_string;
-+
-+    // MODULE VARIABLE DECLARATIONS:
-+    // na
-+
-+    // MODULE VARIABLE DEFINITIONS:
-+    // std::string String;
-+    bool ReportErrors(true);
-+
 +    // Object Data
-+    std::ifstream act_ifs;
-+    std::ofstream obs_ofs;
-+    char *act_filename;
-+    char *obs_filename;
-+    int act_seq = 0;
-+    int obs_seq = 0;
 +
 +    // Subroutine Specifications for the Module
 +
 +    // Functions
 +
-+    int InitializeExtCtrlRoutines(EnergyPlusData &state)
++    void InitializeExtCtrlRoutines(EnergyPlusData &state)
 +    {
-+        static bool firstCall(true);
-+        if (firstCall) {
-+            firstCall = false;
-+            // DisplayString("InitializeExtCtrlRoutine(): First call");
-+
-+            if ((act_filename = getenv("ACT_PIPE_FILENAME")) == NULL) {
-+                ShowFatalError(state, "InitializeExtCtrlActRoutines: Environment variable ACT_PIPE_FILENAME not specified");
-+                DisplayString(state, "InitializeExtCtrlRoutine: ACT file not specified");
-+                return 1;
-+            }
-+            if ((obs_filename = getenv("OBS_PIPE_FILENAME")) == NULL) {
-+                ShowFatalError(state, "InitializeExtCtrlActRoutines: Environment variable OBS_PIPE_FILENAME not specified");
-+                return 1;
-+            }
++        if (state.dataExtCtrl->AlreadyDidOnce) {
++            return;
 +        }
-+        return 0;
++
++        // DisplayString("InitializeExtCtrlRoutine(): First call");
++        get_environment_variable(cActPipeFilename, state.dataExtCtrl->act_filename);
++        if (state.dataExtCtrl->act_filename.empty()) {
++            ShowFatalError(state, "InitializeExtCtrlActRoutines: Environment variable ACT_PIPE_FILENAME not specified");
++        }
++        get_environment_variable(cObsPipeFilename, state.dataExtCtrl->obs_filename);
++        if (state.dataExtCtrl->obs_filename.empty()) {
++            ShowFatalError(state, "InitializeExtCtrlActRoutines: Environment variable OBS_PIPE_FILENAME not specified");
++        }
++
++        state.dataExtCtrl->AlreadyDidOnce = true;
 +    }
 +
 +    std::string ExtCtrlRead(EnergyPlusData &state)
 +    {
++        auto &act_ifs = state.dataExtCtrl->act_ifs;
 +        if (!act_ifs.is_open()) {
-+            act_ifs.open(act_filename);
-+            act_ifs.rdbuf()->pubsetbuf(0, 0); // Making unbuffered
++            act_ifs.open(state.dataExtCtrl->act_filename);
++            act_ifs.rdbuf()->pubsetbuf(nullptr, 0); // Making unbuffered
 +            if (!act_ifs.is_open()) {
 +                ShowFatalError(state, "ExtCtrlRead: ACT file could not open");
 +                return "";
 +            }
-+            DisplayString(state, "ExtCtrlRead: Opened ACT file: " + std::string(act_filename));
++            DisplayString(state, "ExtCtrlRead: Opened ACT file: " + std::string(state.dataExtCtrl->act_filename));
 +        }
++
++        // We just do an infinite loop until a value comes in
 +        std::string line;
-+    again:
-+        act_ifs >> line;
-+        size_t idx = line.find(",");
-+        if (idx == std::string::npos) {
-+            goto again;
++        size_t idx = std::string::npos;
++        while (idx == std::string::npos) {
++            act_ifs >> line;
++            idx = line.find(',');
++            // TODO: include some kind of timeout?
 +        }
++
 +        std::string seq = line.substr(0, idx);
 +        std::string val = line.substr(idx + 1, std::string::npos);
-+        assert(act_seq == seq);
-+        act_seq++;
++        assert(state.dataExtCtrl->act_seq == std::stoi(seq));
++        state.dataExtCtrl->act_seq++;
 +        return val;
 +    }
 +
-+    void ExtCtrlWrite(EnergyPlusData &state, std::string str)
++    void ExtCtrlWrite(EnergyPlusData &state, const std::string &str)
 +    {
-+        if (!obs_ofs.is_open()) {
-+            obs_ofs.open(obs_filename);
-+            if (!obs_ofs.is_open()) {
++        if (!state.dataExtCtrl->obs_ofs.is_open()) {
++            state.dataExtCtrl->obs_ofs.open(state.dataExtCtrl->obs_filename);
++            if (!state.dataExtCtrl->obs_ofs.is_open()) {
 +                ShowFatalError(state, "ExtCtrlWrite: InitializeExtCtrlRoutine: OBS file could not open");
 +                return;
 +            }
-+            DisplayString(state, "ExtCtrlWrite: Opened OBS file: " + std::string(obs_filename));
++            DisplayString(state, "ExtCtrlWrite: Opened OBS file: " + std::string(state.dataExtCtrl->obs_filename));
 +        }
-+        obs_ofs << obs_seq << "," << str << std::endl;
-+        obs_seq++;
++        state.dataExtCtrl->obs_ofs << state.dataExtCtrl->obs_seq << "," << str << std::endl;
++        state.dataExtCtrl->obs_seq++;
 +    }
 +
-+    void ExtCtrlFlush()
++    void ExtCtrlFlush(EnergyPlusData &state)
 +    {
-+        obs_ofs << "DELIMITER" << std::endl;
-+        obs_ofs.flush();
++        state.dataExtCtrl->obs_ofs << "DELIMITER" << std::endl;
++        state.dataExtCtrl->obs_ofs.flush();
 +    }
 +
-+    void InitializeObsData()
-+    {
-+        for (int i = 0; i < NUM_OBSS; i++)
-+            obss[i] = OBS_DATA_NULL;
-+    }
-+
-+    void InitializeActData()
-+    {
-+        for (int i = 0; i < NUM_ACTS; i++)
-+            acts[i] = ACT_DATA_NULL;
-+    }
-+
-+    Real64 ExtCtrlObs(EnergyPlusData &state,
-+                      Real64 const cmd, // command code
-+                      Real64 const arg  // command value
++    bool ExtCtrlObs(EnergyPlusData &state,
++                    int const index,   // command code
++                    Real64 const value // command value
 +    )
 +    {
-+        Int64 cmdInt = cmd;
++        InitializeExtCtrlRoutines(state);
 +
-+        if (InitializeExtCtrlRoutines(state)) {
-+            return -1.0;
-+        }
-+        if (cmdInt >= CMD_OBS_INDEX_LOW && cmdInt <= CMD_OBS_INDEX_HIGH) {
-+            // DisplayString("ExtCtrlObs: set obs[" + std::to_string(cmdInt) + "] = " + std::to_string(arg));
-+            obss[cmdInt - 1] = arg;
-+            return 0.0;
-+        } else if (cmdInt == CMD_OBS_INIT) {
++        if (index >= CMD_OBS_INDEX_LOW && index <= CMD_OBS_INDEX_HIGH) {
++            // DisplayString(format("ExtCtrlObs: set obs[{}] = {}", cmdInt, arg));
++            state.dataExtCtrl->obss[index - 1] = value;
++            return true;
++        } else if (index == CMD_OBS_INIT) {
 +            // DisplayString("ExtCtrlObs: INIT");
 +            //  If not connected to the server, try to connect.
 +            //  TODO:
 +            // ShowFatalError("Failed to connect to external service");
-+            return 0.0;
++            return true;
 +        }
 +        // TODO: Show error code
-+        ShowWarningMessage(state,
-+                           "Obs index " + std::to_string(cmdInt) + " is out of range [" + std::to_string(CMD_OBS_INDEX_LOW) + "..." +
-+                               std::to_string(CMD_OBS_INDEX_HIGH) + "]");
-+        return -1.0;
++        ShowWarningMessage(state, format("ExtCtrlObs: Obs index {} is out of range [{}...{}]", index, CMD_OBS_INDEX_LOW, CMD_OBS_INDEX_HIGH));
++        return false;
 +    }
 +
-+    Real64 ExtCtrlAct(EnergyPlusData &state,
-+                      Real64 const cmd, // command code
-+                      Real64 const arg  // command value
-+    )
++    bool ExtCtrlAct(EnergyPlusData &state,
++                    int const cmd, // command code
++                    int const arg, // command value
++                    Real64 &readValue)
 +    {
-+        Int64 cmdInt = cmd;
-+        Int64 argInt = arg;
++        InitializeExtCtrlRoutines(state);
 +
-+        if (InitializeExtCtrlRoutines(state)) {
-+            return -1.0;
-+        }
-+        if (cmdInt >= CMD_ACT_INDEX_LOW && cmdInt <= CMD_ACT_INDEX_HIGH) {
-+            // DisplayString("ExtCtrlAct: get acts[" + std::to_string(cmdInt) + "] = " + std::to_string(acts[cmdInt - 1]));
-+            return acts[cmdInt - 1];
-+        } else if (cmdInt == CMD_ACT_REQ) {
-+            if (!(argInt >= 0 && argInt <= CMD_ACT_INDEX_HIGH)) {
-+                ShowWarningMessage(state,
-+                                   "ExtCtrlAct: Number of obss " + std::to_string(argInt) + " must be in range [0..." +
-+                                       std::to_string(CMD_ACT_INDEX_HIGH) + "]");
-+                return -1.0;
++        if (cmd >= CMD_ACT_INDEX_LOW && cmd <= CMD_ACT_INDEX_HIGH) {
++            // DisplayString("ExtCtrlAct: get acts[" + std::to_string(cmd) + "] = " +
++            // std::to_string(state.dataExtCtrl->acts[cmd - 1]));
++            readValue = state.dataExtCtrl->acts[cmd - 1];
++            return true;
++        } else if (cmd == CMD_ACT_REQ) {
++            if (!(arg >= 0 && arg <= CMD_ACT_INDEX_HIGH)) {
++                ShowWarningMessage(state, format("ExtCtrlAct:  Number of obss {} it out of range [0...{}]", arg, CMD_ACT_INDEX_HIGH));
++                return false;
 +            }
++            // TODO: really want that?
 +            // skip system timestep
 +            if (state.dataHVACGlobal->TimeStepSys < state.dataGlobal->TimeStepZone) {
-+                return 0.0;
++                return true;
 +            }
 +
 +            // Send observation data to the server, and receive next action.
-+            ExtCtrlWrite(state, std::to_string(argInt));
-+            for (int i = CMD_ACT_INDEX_LOW; i <= argInt; i++) {
-+                ExtCtrlWrite(state, std::to_string(obss[i - 1]));
++            ExtCtrlWrite(state, std::to_string(arg));
++            for (int i = CMD_ACT_INDEX_LOW; i <= arg; i++) {
++                ExtCtrlWrite(state, std::to_string(state.dataExtCtrl->obss[i - 1]));
 +            }
-+            ExtCtrlFlush();
++            ExtCtrlFlush(state);
 +
 +            // Get action data
-+            std::string line;
-+            line = ExtCtrlRead(state);
++            std::string line = ExtCtrlRead(state);
 +            int NumActsReceived = std::stoi(line);
-+            assert(NumActsReceived >= 0 && MumActsReceived <= CMD_ACT_INDEX_HIGH);
++            assert(NumActsReceived >= 0 && NumActsReceived <= CMD_ACT_INDEX_HIGH);
 +            for (int i = 1; i <= NumActsReceived; i++) {
 +                line = ExtCtrlRead(state);
 +                double val = std::stod(line);
 +                if (i <= CMD_ACT_INDEX_HIGH) {
-+                    acts[i - 1] = val;
++                    state.dataExtCtrl->acts[i - 1] = val;
 +                }
 +            }
 +
-+            return 0.0;
++            return true;
 +        }
-+        ShowWarningMessage(state,
-+                           "Act index " + std::to_string(cmdInt) + " is out of range [" + std::to_string(CMD_ACT_INDEX_LOW) + " to " +
-+                               std::to_string(CMD_ACT_INDEX_HIGH) + "]");
-+        return -1.0;
++
++        ShowWarningMessage(state, format("ExtCtrlAct: Act index {} is out of range [{}...{}]", cmd, CMD_ACT_INDEX_LOW, CMD_ACT_INDEX_HIGH));
++        return false;
 +    }
 +
 +} // namespace ExtCtrl
@@ -332,10 +325,10 @@ index 00000000000..79b2001146f
 +} // namespace EnergyPlus
 diff --git a/src/EnergyPlus/ExtCtrl.hh b/src/EnergyPlus/ExtCtrl.hh
 new file mode 100644
-index 00000000000..dfaff629a20
+index 0000000000..5b307b0b44
 --- /dev/null
 +++ b/src/EnergyPlus/ExtCtrl.hh
-@@ -0,0 +1,127 @@
+@@ -0,0 +1,141 @@
 +// EnergyPlus, Copyright (c) 1996-2022, The Board of Trustees of the University of Illinois,
 +// The Regents of the University of California, through Lawrence Berkeley National Laboratory
 +// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
@@ -396,6 +389,7 @@ index 00000000000..dfaff629a20
 +#include <ObjexxFCL/Fmath.hh>
 +
 +// EnergyPlus Headers
++#include <EnergyPlus/Data/BaseData.hh>
 +#include <EnergyPlus/DataGlobals.hh>
 +#include <EnergyPlus/EnergyPlus.hh>
 +#include <EnergyPlus/UtilityRoutines.hh>
@@ -407,64 +401,77 @@ index 00000000000..dfaff629a20
 +
 +namespace ExtCtrl {
 +
-+    // Data
-+    // MODULE PARAMETER DEFINITIONS:
-+    // For SEND command
-+    extern int const CMD_OBS_INIT;
-+    extern int const NUM_OBSS;
-+    extern int const CMD_OBS_INDEX_LOW;
-+    extern int const CMD_OBS_INDEX_HIGH;
-+    extern Real64 stats[];
-+    extern Real64 const STAT_DATA_NULL;
++    int constexpr CMD_OBS_INIT(0);
++    int constexpr NUM_OBSS(100);
++    int constexpr CMD_OBS_INDEX_LOW(1);
++    int constexpr CMD_OBS_INDEX_HIGH(NUM_OBSS);
++    Real64 constexpr OBS_DATA_NULL(-123.0);
 +
-+    // For RECV command
-+    extern int const CMD_ACT_REQ;
-+    extern int const NUM_ACTS;
-+    extern int const CMD_ACT_INDEX_LOW;
-+    extern int const CMD_ACT_INDEX_HIGH;
-+    extern Real64 acts[];
-+    extern Real64 const ACT_DATA_NULL;
++    // For receiving action
++    int constexpr CMD_ACT_REQ(0);
++    int constexpr NUM_ACTS(100);
++    int constexpr CMD_ACT_INDEX_LOW(1);
++    int constexpr CMD_ACT_INDEX_HIGH(NUM_ACTS);
++    Real64 constexpr ACT_DATA_NULL(-456.0);
 +
-+    extern std::string const blank_string;
++    constexpr const char *cActPipeFilename("ACT_PIPE_FILENAME");
++    constexpr const char *cObsPipeFilename("OBS_PIPE_FILENAME");
 +
-+    // MODULE VARIABLE DECLARATIONS:
-+    // na
++    void InitializeExtCtrlRoutines(EnergyPlusData &state);
 +
-+    // MODULE VARIABLE DEFINITIONS:
-+    extern std::string String;
-+    extern bool ReportErrors;
-+
-+    // DERIVED TYPE DEFINITIONS
-+
-+    // Types
-+
-+    // Object Data
-+
-+    // Subroutine Specifications for the Module
-+
-+    // Functions
-+
-+    int InitializeExtCtrlRoutines(EnergyPlusData &state);
-+    void InitializeObsData();
-+    void InitializeActData();
-+
-+    Real64 ExtCtrlObs(EnergyPlusData &state,
-+                      Real64 const cmd, // command code
-+                      Real64 const arg  // command value
++    // Sends observations from E+ (reading a sensor) to the FIFO
++    bool ExtCtrlObs(EnergyPlusData &state,
++                    int const index,   // command code
++                    Real64 const value // command value
 +    );
 +
-+    Real64 ExtCtrlAct(EnergyPlusData &state,
-+                      Real64 const cmd, // command code
-+                      Real64 const arg  // command value
++    // Retrieve computed values from the FIFO
++    // Special case is when cmd = CMD_ACT_REQ(0), then second args tells how many datapoints to read
++    // Returns -1.0 in case of problem
++    bool ExtCtrlAct(EnergyPlusData &state,
++                    int const cmd,    // command code
++                    int const arg,    // command value
++                    Real64 &readValue // Output: Returned value, only valid if return value from function is true
 +    );
 +
 +} // namespace ExtCtrl
++
++struct ExtCtrlData : BaseGlobalStruct
++{
++    bool AlreadyDidOnce = false;
++    std::array<Real64, ExtCtrl::NUM_OBSS> obss{};
++    std::array<Real64, ExtCtrl::NUM_ACTS> acts{};
++
++    std::ifstream act_ifs;
++    std::ofstream obs_ofs;
++    std::string act_filename;
++    std::string obs_filename;
++    int act_seq = 0;
++    int obs_seq = 0;
++
++    ExtCtrlData()
++    {
++        obss.fill(ExtCtrl::OBS_DATA_NULL);
++        acts.fill(ExtCtrl::ACT_DATA_NULL);
++    }
++
++    void clear_state() override
++    {
++        this->AlreadyDidOnce = false;
++        obss.fill(ExtCtrl::OBS_DATA_NULL);
++        acts.fill(ExtCtrl::ACT_DATA_NULL);
++        act_filename.clear();
++        obs_filename.clear();
++        act_seq = 0;
++        obs_seq = 0;
++    }
++};
 +
 +} // namespace EnergyPlus
 +
 +#endif
 diff --git a/src/EnergyPlus/RuntimeLanguageProcessor.cc b/src/EnergyPlus/RuntimeLanguageProcessor.cc
-index 6fc567ee913..2b171a73c72 100644
+index 6fc567ee91..bd55f986cb 100644
 --- a/src/EnergyPlus/RuntimeLanguageProcessor.cc
 +++ b/src/EnergyPlus/RuntimeLanguageProcessor.cc
 @@ -68,6 +68,7 @@
@@ -485,18 +492,29 @@ index 6fc567ee913..2b171a73c72 100644
                      // was a built in function operator
                  } else { // throw error
                      if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "ERROR \"{}\"\n", String);
-@@ -2504,6 +2506,10 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum,
+@@ -2504,6 +2506,21 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum,
                                           Operand(2).Number,
                                           state.dataWeatherManager->TomorrowLiquidPrecip,
                                           ReturnValue);
 +                } else if (SELECT_CASE_var == ErlFunc::ExtCtrlObs) {
-+                    ReturnValue = SetErlValueNumber(ExtCtrl::ExtCtrlObs(state, Operand(1).Number, Operand(2).Number));
++                    if (ExtCtrl::ExtCtrlObs(state, Operand(1).Number, Operand(2).Number)) {
++                        ReturnValue = SetErlValueNumber(0.0); // OK
++                    } else {
++                        ReturnValue.Type = Value::Error;
++                        ReturnValue.Error = "Error in ExtCtrlObs";
++                    }
 +                } else if (SELECT_CASE_var == ErlFunc::ExtCtrlAct) {
-+                    ReturnValue = SetErlValueNumber(ExtCtrl::ExtCtrlAct(state, Operand(1).Number, Operand(2).Number));
++                    Real64 readValue = 0.0;
++                    if (ExtCtrl::ExtCtrlAct(state, Operand(1).Number, Operand(2).Number, readValue)) {
++                        ReturnValue = SetErlValueNumber(readValue);
++                    } else {
++                        ReturnValue.Type = Value::Error;
++                        ReturnValue.Error = "Error in ExtCtrlAct";
++                    }
                  } else {
                      // throw Error!
                      ShowFatalError(state, "caught unexpected Expression(ExpressionNum)%Operator in EvaluateExpression");
-@@ -4344,6 +4350,14 @@ void SetupPossibleOperators(EnergyPlusData &state)
+@@ -4344,6 +4361,14 @@ void SetupPossibleOperators(EnergyPlusData &state)
      state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowLiquidPrecip)).NumOperands = 2;
      state.dataRuntimeLang->PossibleOperators(static_cast<int>(ErlFunc::TomorrowLiquidPrecip)).Code = ErlFunc::TomorrowLiquidPrecip;
  
@@ -511,3 +529,115 @@ index 6fc567ee913..2b171a73c72 100644
      state.dataRuntimeLangProcessor->AlreadyDidOnce = true;
  }
  
+diff --git a/src/EnergyPlus/api/datatransfer.cc b/src/EnergyPlus/api/datatransfer.cc
+index 565065bf64..c6b4963ca8 100644
+--- a/src/EnergyPlus/api/datatransfer.cc
++++ b/src/EnergyPlus/api/datatransfer.cc
+@@ -45,6 +45,7 @@
+ // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ // POSSIBILITY OF SUCH DAMAGE.
+ 
++#include "EnergyPlus/ExtCtrl.hh"
+ #include <cmath>
+ 
+ #include <ObjexxFCL/ArrayS.functions.hh>
+@@ -1192,3 +1193,25 @@ Real64 currentSimTime(EnergyPlusState state)
+     Real64 value = (thisState->dataGlobal->DayOfSim - 1) * 24 + currentTime(state);
+     return value;
+ }
++
++int extCtrlObs(EnergyPlusState state, int index, Real64 value)
++{
++    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
++    int return_code = 0;
++    if (!EnergyPlus::ExtCtrl::ExtCtrlObs(*thisState, index, value)) {
++        thisState->dataPluginManager->apiErrorFlag = true;
++        return_code = 1;
++    }
++    return return_code;
++}
++
++Real64 extCtrlAct(EnergyPlusState state, int cmd, int arg)
++{
++    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
++    Real64 value = 0.0;
++    if (!EnergyPlus::ExtCtrl::ExtCtrlAct(*thisState, cmd, arg, value)) {
++        value = -1.0;
++        thisState->dataPluginManager->apiErrorFlag = true;
++    }
++    return value;
++}
+diff --git a/src/EnergyPlus/api/datatransfer.h b/src/EnergyPlus/api/datatransfer.h
+index baa55fa1f1..50784ec114 100644
+--- a/src/EnergyPlus/api/datatransfer.h
++++ b/src/EnergyPlus/api/datatransfer.h
+@@ -803,6 +803,28 @@ ENERGYPLUSLIB_API Real64 tomorrowWeatherLiquidPrecipitationAtTime(EnergyPlusStat
+ /// \see apiErrorFlag
+ ENERGYPLUSLIB_API Real64 currentSimTime(EnergyPlusState state);
+ 
++/// \brief Sends observations from E+ to the Obs FIFO
++/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
++/// \param[in] index The index of the observation array to store it in
++/// \param[in] value The value from E+ (eg a sensor, or a calculated value)
++/// \return a return code of 0 if it worked fine, 1 otherwise
++/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
++/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
++/// \see apiDataFullyReady
++/// \see apiErrorFlag
++ENERGYPLUSLIB_API int extCtrlObs(EnergyPlusState state, int index, Real64 value);
++
++/// \brief Reads external data from the Act FIFO
++/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
++/// \param[in] cmd The index of the array to read
++/// \param[in] arg The number of observations that needs reading if cmd = 0
++/// \return the value it read, or 0.0 if it just worked when cmd=0, or -1.0 if something went wrong
++/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
++/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
++/// \see apiDataFullyReady
++/// \see apiErrorFlag
++ENERGYPLUSLIB_API Real64 extCtrlAct(EnergyPlusState state, int cmd, int arg);
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/src/EnergyPlus/api/datatransfer.py b/src/EnergyPlus/api/datatransfer.py
+index 01be38d7d3..2b5e0c9498 100644
+--- a/src/EnergyPlus/api/datatransfer.py
++++ b/src/EnergyPlus/api/datatransfer.py
+@@ -247,6 +247,10 @@ class DataExchange:
+         self.api.tomorrowWeatherLiquidPrecipitationAtTime.restype = RealEP
+         self.api.currentSimTime.argtypes = [c_void_p]
+         self.api.currentSimTime.restype = RealEP
++        self.api.extCtrlObs.argtypes = [c_void_p, c_int, RealEP]
++        self.api.extCtrlObs.restype = c_int
++        self.api.extCtrlAct.argtypes = [c_void_p, c_int, c_int]
++        self.api.extCtrlAct.restype = RealEP
+ 
+     def list_available_api_data_csv(self, state: c_void_p) -> bytes:
+         """
+@@ -1436,3 +1440,25 @@ class DataExchange:
+         :return: Value of the simulation time from the start of the environment in fractional hours
+         """
+         return self.api.currentSimTime(state)
++
++    def extctrl_obs(self, state: c_void_p, index: int, value: float) -> int:
++        """
++        Sends observations from E+ to the Obs FIFO
++
++        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
++        :param index: The index of the observation array to store it in
++        :param value: The value from E+ (eg a sensor, or a calculated value)
++        :return: a return code of 0 if it worked fine, 1 otherwise
++        """
++        return self.api.extCtrlObs(state, index, value)
++
++    def extctrl_act(self, state: c_void_p, cmd: int, arg: int) -> float:
++        """
++        Reads external data from the Act FIFO
++
++        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
++        :param cmd: The index of the array to read, (or 0 to tell it to read)
++        :param arg: The number of observations that needs reading if cmd = 0, ignored otherwise
++        :return: the value it read, or 0.0 if it just worked when cmd=0, or -1.0 if something went wrong
++        """
++        return self.api.extCtrlAct(state, cmd, arg)
