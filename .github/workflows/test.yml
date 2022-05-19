@@ -18,7 +18,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install python dependencies
       run: |
-        apt install -y python3-mpi4py
+        sudo apt install -y python3-mpi4py
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then 
           cat requirements.txt | grep -v baselines | xargs pip install --ignore-installed
