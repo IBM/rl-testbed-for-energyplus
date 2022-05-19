@@ -1,3 +1,5 @@
+[![unit tests](https://github.com/IBM/rl-testbed-for-energyplus/actions/workflows/test.yml/badge.svg)](https://github.com/IBM/rl-testbed-for-energyplus/actions/workflows/test.yml)
+
 # Project Description
 Reinforcement Learning Testbed for Power Consumption Optimization.
 
