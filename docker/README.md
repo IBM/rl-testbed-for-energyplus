@@ -3,6 +3,18 @@
 The docker image that can be built using `Dockerfile` allows automating setup and ensures reproducible work 
 environment.
 
+### Pre-built images
+
+See the existing [list of docker images](https://github.com/users/antoine-galataud/packages/container/package/rl-testbed-for-energyplus)
+
+Usage example:
+
+```shell
+docker pull ghcr.io/antoine-galataud/rl-testbed-for-energyplus:ep22.1.0
+```
+
+where image tag `ep22.1.0` is the EnergyPlus version that the image is using.
+
 ### Building
 
 You need `docker` installed (ie `sudo apt install docker.io`).
@@ -14,11 +26,11 @@ cd rl-testbed-for-energyplus/
 docker build . -f docker/Dockerfile -t rl-testbed-for-energyplus
 ```
 
-The default EnergyPlus version used in the image is `9-6-0`. To use a different one, follow example below:
+The default EnergyPlus version used in the image is `22-1-0`. To use a different one, follow example below:
 
 ```shell
 docker build . \
-  --build-arg EPLUS_VERSION=9-5-0 \
+  --build-arg EPLUS_VERSION=9-6-0 \
   --build-arg EPLUS_DL_URL="<EnergyPlus download URL>" \
   -t rl-testbed-for-energyplus
 ```
