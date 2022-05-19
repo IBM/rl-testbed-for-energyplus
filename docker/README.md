@@ -62,3 +62,32 @@ Tip: simply use `$(pwd)` instead of `/path/to/project` if you want to mount the 
 
 Note: all modifications you will make to your sources located on your hard drive will be reflected in the running 
 docker container.
+
+### Plotting
+
+If you want to monitor progress using plots from inside the docker container, this can be done in 3 steps (tested on Ubuntu, probably not working on MacOS):
+
+Make sure all clients can access your display:
+
+```shell
+sudo apt install x11-xserver-utils
+xhost +
+```
+
+Run the container so it can access your display:
+
+```shell
+docker run -it \
+    --env="QT_X11_NO_MITSHM=1" \
+    --env="DISPLAY" \
+    --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
+    rl-testbed-for-energyplus
+```
+
+Run the experiment, then run monitoring tool as usual (inside the container):
+
+```shell
+python3 -m baselines_energyplus.common.plot_energyplus
+```
+
+For more information, see also [this tutorial](http://wiki.ros.org/docker/Tutorials/GUI)
