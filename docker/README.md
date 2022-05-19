@@ -84,7 +84,7 @@ docker run -it \
     rl-testbed-for-energyplus
 ```
 
-Then run monitoring tool as usual (inside the container):
+Run the experiment, then run monitoring tool as usual (inside the container):
 
 ```shell
 python3 -m baselines_energyplus.common.plot_energyplus
