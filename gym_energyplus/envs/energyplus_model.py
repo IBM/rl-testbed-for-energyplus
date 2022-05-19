@@ -15,6 +15,7 @@ import matplotlib
 import pandas as pd
 import math
 import json
+import re
 
 class EnergyPlusModel(metaclass=ABCMeta):
 
