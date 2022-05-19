@@ -27,12 +27,12 @@ class EnergyPlusModel2ZoneDataCenterHVAC_wEconomizer(EnergyPlusModel):
         self.axepisode = None
         self.num_axes = 5
         self.text_power_consumption = None
+        if self.energyplus_version < (9, 4, 0):
+            self.facility_power_output_var_suffix = "Electric Demand Power"
+        else:
+            self.facility_power_output_var_suffix = "Electricity Demand Rate"
 
         self.electric_powers = [
-            #'Whole Building:Facility Total Electric Demand Power [W](Hourly)', # very high
-            #'Whole Building:Facility Total Building Electric Demand Power [W](Hourly)', # very high
-            #'Whole Building:Facility Total HVAC Electric Demand Power [W](Hourly)', # low
-
             #'WESTDATACENTER_EQUIP:ITE CPU Electric Power [W](Hourly)', # low
             #'WESTDATACENTER_EQUIP:ITE Fan Electric Power [W](Hourly)', # low
             #'WESTDATACENTER_EQUIP:ITE UPS Electric Power [W](Hourly)', # low
@@ -48,10 +48,9 @@ class EnergyPlusModel2ZoneDataCenterHVAC_wEconomizer(EnergyPlusModel):
             #'WEST DATA CENTER DEC:Evaporative Cooler Electric Power [W](TimeStep)', # low (never works)
             #'EMS:Power Utilization Effectiveness [](TimeStep)',
 
-
-            #'Whole Building:Facility Total Electric Demand Power [W](Hourly)', # very high
-            #'Whole Building:Facility Total Building Electric Demand Power [W](Hourly)', # very high
-            #'Whole Building:Facility Total HVAC Electric Demand Power [W](Hourly)', # low
+            #f'Whole Building:Facility Total {self.facility_power_output_var_suffix} [W](Hourly)', # very high
+            #f'Whole Building:Facility Total Building {self.facility_power_output_var_suffix} [W](Hourly)', # very high
+            #f'Whole Building:Facility Total HVAC {self.facility_power_output_var_suffix} [W](Hourly)', # low
 
             #'EASTDATACENTER_EQUIP:ITE CPU Electric Power [W](Hourly)', # low
             #'EASTDATACENTER_EQUIP:ITE Fan Electric Power [W](Hourly)', # low
@@ -246,9 +245,9 @@ class EnergyPlusModel2ZoneDataCenterHVAC_wEconomizer(EnergyPlusModel):
     #   state[1] = raw_state[1]: WEST ZONE:Zone Air Temperature [C](TimeStep)
     #   state[2] = raw_state[2]: EAST ZONE:Zone Air Temperature [C](TimeStep)
     #              raw_state[3]: EMS:Power Utilization Effectiveness [](TimeStep)
-    #   state[3] = raw_state[4]: Whole Building:Facility Total Electric Demand Power [W](Hourly)
-    #   state[4] = raw_state[5]: Whole Building:Facility Total Building Electric Demand Power [W](Hourly)
-    #   state[5] = raw_state[6]: Whole Building:Facility Total HVAC Electric Demand Power [W](Hourly)
+    #   state[3] = raw_state[4]: Whole Building:Facility Total Electricity Demand Rate [W](Hourly)
+    #   state[4] = raw_state[5]: Whole Building:Facility Total Building Electricity Demand Rate [W](Hourly)
+    #   state[5] = raw_state[6]: Whole Building:Facility Total HVAC Electricity Demand Rate [W](Hourly)
     def format_state(self, raw_state):
         return np.array([raw_state[0], raw_state[1], raw_state[2], raw_state[4], raw_state[5], raw_state[6]])
 
@@ -313,9 +312,9 @@ class EnergyPlusModel2ZoneDataCenterHVAC_wEconomizer(EnergyPlusModel):
         self.eastzone_air_loop_outlet_setpoint_temp = df['EAST AIR LOOP OUTLET NODE:System Node Setpoint Temperature [C](TimeStep)']
 
         # Electric power
-        self.total_building_electric_demand_power = df['Whole Building:Facility Total Building Electric Demand Power [W](Hourly)']
-        self.total_hvac_electric_demand_power = df['Whole Building:Facility Total HVAC Electric Demand Power [W](Hourly)']
-        self.total_electric_demand_power = df['Whole Building:Facility Total Electric Demand Power [W](Hourly)']
+        self.total_building_electric_demand_power = df[f'Whole Building:Facility Total Building {self.facility_power_output_var_suffix} [W](Hourly)']
+        self.total_hvac_electric_demand_power = df[f'Whole Building:Facility Total HVAC {self.facility_power_output_var_suffix} [W](Hourly)']
+        self.total_electric_demand_power = df[f'Whole Building:Facility Total {self.facility_power_output_var_suffix} [W](Hourly)']
 
         # Compute reward list
         self.rewards = []
@@ -357,7 +356,7 @@ class EnergyPlusModel2ZoneDataCenterHVAC_wEconomizer(EnergyPlusModel):
         self.show_statistics('Reward', self.rewards)
         self.show_statistics('westzone_temp', self.df['WEST ZONE:Zone Air Temperature [C](TimeStep)'])
         self.show_statistics('eastzone_temp', self.df['EAST ZONE:Zone Air Temperature [C](TimeStep)'])
-        self.show_statistics('Power consumption', self.df['Whole Building:Facility Total Electric Demand Power [W](Hourly)'])
+        self.show_statistics('Power consumption', self.df[f'Whole Building:Facility Total {self.facility_power_output_var_suffix} [W](Hourly)'])
         self.show_statistics('pue', self.pue)
         self.show_distrib('westzone_temp distribution', self.df['WEST ZONE:Zone Air Temperature [C](TimeStep)'])
 
@@ -482,9 +481,9 @@ class EnergyPlusModel2ZoneDataCenterHVAC_wEconomizer(EnergyPlusModel):
             ax = self.axepisode[idx]
             idx += 1
             ax.lines = []
-            #ax.plot(self.total_electric_demand_power, 'C0', label='Whole Building:Facility Total Electric Demand Power')
-            #ax.plot(self.total_building_electric_demand_power, 'C1', label='Whole Building:Facility Total Building Electric Demand Power')
-            #ax.plot(self.total_hvac_electric_demand_power, 'C2', label='Whole Building:Facility Total HVAC Electric Demand Power')
+            #ax.plot(self.total_electric_demand_power, 'C0', label=f'Whole Building:Facility Total {self.facility_power_output_var_suffix}')
+            #ax.plot(self.total_building_electric_demand_power, 'C1', label=f'Whole Building:Facility Total Building {self.facility_power_output_var_suffix}')
+            #ax.plot(self.total_hvac_electric_demand_power, 'C2', label=f'Whole Building:Facility Total HVAC {self.facility_power_output_var_suffix}')
             for i, pow in enumerate(self.electric_powers):
                 ax.plot(self.df[pow], 'C{}'.format(i % 10), label=pow)
             ax.legend()
@@ -497,9 +496,9 @@ class EnergyPlusModel2ZoneDataCenterHVAC_wEconomizer(EnergyPlusModel):
             ax = self.axepisode[idx]
             idx += 1
             ax.lines = []
-            ax.plot(self.total_electric_demand_power, 'C0', label='Whole Building:Facility Total Electric Demand Power')
-            ax.plot(self.total_building_electric_demand_power, 'C1', label='Whole Building:Facility Total Building Electric Demand Power')
-            ax.plot(self.total_hvac_electric_demand_power, 'C2', label='Whole Building:Facility Total HVAC Electric Demand Power')
+            ax.plot(self.total_electric_demand_power, 'C0', label=f'Whole Building:Facility Total {self.facility_power_output_var_suffix}')
+            ax.plot(self.total_building_electric_demand_power, 'C1', label=f'Whole Building:Facility Total Building {self.facility_power_output_var_suffix}')
+            ax.plot(self.total_hvac_electric_demand_power, 'C2', label=f'Whole Building:Facility Total HVAC {self.facility_power_output_var_suffix}')
             ax.legend()
             ax.set_ylabel('Power (W)')
             ax.set_xlabel('Simulation days (MM/DD)')
@@ -508,9 +507,12 @@ class EnergyPlusModel2ZoneDataCenterHVAC_wEconomizer(EnergyPlusModel):
         # Show average power consumption in text
         if self.text_power_consumption is not None:
             self.text_power_consumption.remove()
-        self.text_power_consumption = self.fig.text(0.02,  0.25, 'Whole Power:    {:6,.1f} kW'.format(np.average(self.df['Whole Building:Facility Total Electric Demand Power [W](Hourly)']) / 1000))
-        self.text_power_consumption = self.fig.text(0.02,  0.235, 'Building Power: {:6,.1f} kW'.format(np.average(self.df['Whole Building:Facility Total Building Electric Demand Power [W](Hourly)']) / 1000))
-        self.text_power_consumption = self.fig.text(0.02,  0.22, 'HVAC Power:     {:6,.1f} kW'.format(np.average(self.df['Whole Building:Facility Total HVAC Electric Demand Power [W](Hourly)']) / 1000))
+        self.text_power_consumption = self.fig.text(0.02,  0.25, 'Whole Power:    {:6,.1f} kW'.format(
+            np.average(self.df[f'Whole Building:Facility Total {self.facility_power_output_var_suffix} [W](Hourly)']) / 1000))
+        self.text_power_consumption = self.fig.text(0.02,  0.235, 'Building Power: {:6,.1f} kW'.format(
+            np.average(self.df[f'Whole Building:Facility Total Building {self.facility_power_output_var_suffix} [W](Hourly)']) / 1000))
+        self.text_power_consumption = self.fig.text(0.02,  0.22, 'HVAC Power:     {:6,.1f} kW'.format(
+            np.average(self.df[f'Whole Building:Facility Total HVAC {self.facility_power_output_var_suffix} [W](Hourly)']) / 1000))
 
     #--------------------------------------------------
     # Dump timesteps
@@ -539,7 +541,7 @@ class EnergyPlusModel2ZoneDataCenterHVAC_wEconomizer(EnergyPlusModel):
                         self.rewards,
                         self.df['WEST ZONE:Zone Air Temperature [C](TimeStep)'],
                         self.df['EAST ZONE:Zone Air Temperature [C](TimeStep)'],
-                        self.df['Whole Building:Facility Total Electric Demand Power [W](Hourly)'],
+                        self.df[f'Whole Building:Facility Total {self.facility_power_output_var_suffix} [W](Hourly)'],
                         rewards_avg):
                     f.write('{},{},{},{},{},{},{},{}\n'.format(tot_num_rec, ep, ep_num_rec, rew, tz1, tz2, pow, rew_avg))
                     tot_num_rec += 1
@@ -564,6 +566,6 @@ class EnergyPlusModel2ZoneDataCenterHVAC_wEconomizer(EnergyPlusModel):
                 In22_25_1 = np.sum((Temp1 >= 22.0) & (Temp1 <= 25.0)) / len(Temp1)
                 In22_25_2 = np.sum((Temp2 >= 22.0) & (Temp2 <= 25.0)) / len(Temp2)
                 Rew, _, _, _ = self.get_statistics(self.rewards)
-                Power, _, _, _ = self.get_statistics(self.df['Whole Building:Facility Total Electric Demand Power [W](Hourly)'])
+                Power, _, _, _ = self.get_statistics(self.df[f'Whole Building:Facility Total {self.facility_power_output_var_suffix} [W](Hourly)'])
                 
                 f.write('"{}" {:5.2f} {:5.2f} {:5.2f} {:4.2f} {:5.2f} {:5.2f} {:5.2f} {:4.2f} {:5.2f} {:9.2f} {:8.3%} {:8.3%} {:3d}\n'.format(self.weather_key, Ave1, Min1, Max1, STD1, Ave2,  Min2, Max2, STD2, Rew, Power, In22_25_1, In22_25_2, ep))
