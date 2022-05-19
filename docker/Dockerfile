@@ -64,7 +64,7 @@ RUN export EPLUS_INSTALL_PATH=/usr/local/EnergyPlus-${EPLUS_VERSION} && \
     ln -s ${EPLUS_INSTALL_PATH}/ExpandObjects /usr/local/bin/ExpandObjects && \
     ln -s ${EPLUS_INSTALL_PATH}/ReadVarsESO /usr/local/bin/ReadVarsESO && \
     # install python dependencies
-    apt update && apt install -y locales python3-pip python3-mpi4py git libgl1-mesa-glx libglib2.0-0 && \
+    apt update && apt install -y locales python3-pip python3-mpi4py python3-tk git libgl1-mesa-glx libglib2.0-0 && \
     pip3 install -U pip && \
     # installing deps in 2 steps:
     # - baselines requires tensorflow installed first
