@@ -331,7 +331,7 @@ class EnergyPlusModel(metaclass=ABCMeta):
             self.episode_dirs = [ os.path.dirname(csv_file) ]
             self.num_episodes = len(self.episode_dirs)
 
-    def extract_energyplus_version(model_file):
+    def extract_energyplus_version(self, model_file):
         with open(model_file, "r") as mf:
             match = re.search(r'Version,[\n ]*([0-9.]+);', mf.read())
             assert match, "couldn't find EnergyPlus version in {}".format(model_file)
