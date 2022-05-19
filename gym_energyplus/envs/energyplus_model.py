@@ -24,6 +24,7 @@ class EnergyPlusModel(metaclass=ABCMeta):
                  verbose=False):
         self.log_dir = log_dir
         self.model_basename = os.path.splitext(os.path.basename(model_file))[0]
+        self.energyplus_version = self.extract_energyplus_version(model_file)
         self.setup_spaces()
         self.action = 0.5 * (self.action_space.low + self.action_space.high)
         self.action_prev = self.action
@@ -329,6 +330,15 @@ class EnergyPlusModel(metaclass=ABCMeta):
         else: #csv_file != ''
             self.episode_dirs = [ os.path.dirname(csv_file) ]
             self.num_episodes = len(self.episode_dirs)
+
+    def extract_energyplus_version(model_file):
+        with open(model_file, "r") as mf:
+            match = re.search(r'Version,[\n ]*([0-9.]+);', mf.read())
+            assert match, "couldn't find EnergyPlus version in {}".format(model_file)
+            energyplus_version = match.group(1)
+            if len(energyplus_version.split(".")) == 2:
+                 energyplus_version += ".0"
+            return tuple([int(p) for p in energyplus_version.split(".")])
 
     # Model dependent methods
     @abstractmethod
