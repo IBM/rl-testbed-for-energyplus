@@ -19,13 +19,8 @@ from gym_energyplus.envs import EnergyPlusEnv
 
 def env_creator(seed):
     """
-    Create a wrapped, monitored gym.Env for EnergyEnv
+    Create gym.Env for EnergyEnv
     """
-    # env = gym.make(env_id)
-    # TODO: cannot pickle files that are not open for reading
-    #       here Monitor opens a file with 'wt' mode.
-    # env = Monitor(env, log_dir)
-    # env.seed(seed)
     return lambda cfg: EnergyPlusEnv(
         energyplus_file=cfg["energyplus_file"],
         model_file=cfg["model_file"],
@@ -67,8 +62,9 @@ def train(env_id, num_timesteps, seed):
             "weather_file": weather,
             "log_dir": log_dir
         },
-        "gamma": 0.5,
         "framework": "tf2",
+        # see Ray PPO config for all options
+        "gamma": 0.99,
         "kl_coeff": 0.2
     }
 
