@@ -4,20 +4,16 @@ Helpers for script run_energyplus.py.
 
 import os
 import gym
-from baselines import logger
 from baselines_energyplus.bench import Monitor
-from baselines.common import set_global_seeds
-from baselines.common.atari_wrappers import make_atari, wrap_deepmind
-from baselines.common.vec_env.subproc_vec_env import SubprocVecEnv
-from mpi4py import MPI
 import glob
 # following import necessary to register EnergyPlus-v0 env
-import gym_energyplus
+import gym_energyplus  # noqa
 
 def make_energyplus_env(env_id, seed):
     """
     Create a wrapped, monitored gym.Env for EnergyEnv
     """
+    from baselines import logger
     env = gym.make(env_id)
     env = Monitor(env, logger.get_dir())
     env.seed(seed)
@@ -37,7 +33,7 @@ def energyplus_arg_parser():
     parser = arg_parser()
     parser.add_argument('--env', '-e', help='environment ID', type=str, default='EnergyPlus-v0')
     parser.add_argument('--seed', '-s', help='RNG seed', type=int, default=0)
-    parser.add_argument('--num-timesteps', type=int, default=int(100))
+    parser.add_argument('--num-timesteps', type=int, default=int(1e6))
     parser.add_argument('--save-interval', type=int, default=int(0))
     parser.add_argument('--model-pickle', help='model pickle', type=str, default='')
     parser.add_argument('--checkpoint', help='checkpoint file', type=str, default='')
