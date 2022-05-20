@@ -4,14 +4,11 @@
 
 from abc import ABCMeta, abstractmethod
 import os, sys, time
-from scipy.special import expit
 import numpy as np
 from datetime import datetime, timedelta
 from glob import glob
-from matplotlib.widgets import Slider, Button, RadioButtons
-import datetime as dt
+from matplotlib.widgets import Slider, Button
 import matplotlib.pyplot as plt
-import matplotlib
 import pandas as pd
 import math
 import json
@@ -148,7 +145,12 @@ class EnergyPlusModel(metaclass=ABCMeta):
 
     # Show convergence
     def show_progress(self):
-        self.monitor_file = self.log_dir + '/monitor.csv'
+        # with openai, we have a single env created that dumps monitor.csv
+        # with ray, we use progress.csv
+        if "ray" in self.log_dir:
+            self.monitor_file = self.log_dir + "/progress.csv"
+        else:
+            self.monitor_file = self.log_dir + "/monitor.csv"
 
         # Read progress file
         if not self.read_monitor_file():
@@ -235,24 +237,45 @@ class EnergyPlusModel(metaclass=ABCMeta):
         if ts > self.timestamp_csv:
             # Monitor file is updated.
             self.timestamp_csv = ts
-            f = open(self.monitor_file)
-            firstline = f.readline()
-            assert firstline.startswith('#')
-            metadata = json.loads(firstline[1:])
-            assert metadata['env_id'] == "EnergyPlus-v0"
-            assert set(metadata.keys()) == {'env_id', 't_start'},  "Incorrect keys in monitor metadata"
-            df = pd.read_csv(f, index_col=None)
-            assert set(df.keys()) == {'l', 't', 'r'}, "Incorrect keys in monitor logline"
-            f.close()
+
+            def parse_openai_monitor(mfile):
+                firstline = mfile.readline()
+                assert firstline.startswith('#')
+                metadata = json.loads(firstline[1:])
+                assert metadata['env_id'] == "EnergyPlus-v0"
+                assert set(metadata.keys()) == {'env_id', 't_start'},  "Incorrect keys in monitor metadata"
+                data = pd.read_csv(mfile, index_col=None)
+                assert set(data.keys()) == {'l', 't', 'r'}, "Incorrect keys in monitor logline"
+                return data
+
+            def parse_ray_progress(mfile):
+                data = pd.read_csv(mfile, index_col=None)
+                assert all([
+                    col in data.columns
+                    for col in ["episode_reward_mean", "episode_len_mean"]
+                ]), "couldn't find data keys in progress.csv"
+                return data
+
+            with open(self.monitor_file) as f:
+                if "openai" in self.monitor_file:
+                    df = parse_openai_monitor(f)
+                elif "ray" in self.monitor_file:
+                    df = parse_ray_progress(f)
+                else:
+                    raise ValueError(f"no parser for {self.monitor_file}")
 
             self.reward = []
             self.reward_mean = []
             self.episode_dirs = []
             self.num_episodes = 0
-            for rew, len, time_ in zip(df['r'], df['l'], df['t']):
+            cols = ["r", "l"] if "openai" in self.monitor_file else ["episode_reward_mean", "episode_len_mean"]
+            rew_length = zip(df[cols[0]], df[cols[1]])
+            for rew, len in rew_length:
                 self.reward.append(rew / len)
                 self.reward_mean.append(rew / len)
-                self.episode_dirs.append(self.log_dir + '/output/episode-{:08d}'.format(self.num_episodes))
+                # TODO: this doesn't work for ray
+                self.episode_dirs.append(
+                    self.log_dir + '/output/episode-{:08d}-{:05}'.format(self.num_episodes, os.getpid()))
                 self.num_episodes += 1
             if self.num_episodes > self.num_episodes_last:
                 self.num_episodes_last = self.num_episodes
@@ -323,8 +346,8 @@ class EnergyPlusModel(metaclass=ABCMeta):
             # Make a list of all episodes
             # Note: Somethimes csv file is missing in the episode directories
             # We accept gziped csv file also.
-            csv_list = glob(log_dir + '/output/episode-????????/eplusout.csv') \
-                       + glob(log_dir + '/output/episode-????????/eplusout.csv.gz')
+            csv_list = glob(log_dir + '/output/episode.*/eplusout.csv') \
+                       + glob(log_dir + '/output/episode.*/eplusout.csv.gz')
             self.episode_dirs = list(set([os.path.dirname(i) for i in csv_list]))
             self.episode_dirs.sort()
             self.num_episodes = len(self.episode_dirs)
