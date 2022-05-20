@@ -33,15 +33,20 @@ def energyplus_arg_parser():
     parser = arg_parser()
     parser.add_argument('--env', '-e', help='environment ID', type=str, default='EnergyPlus-v0')
     parser.add_argument('--seed', '-s', help='RNG seed', type=int, default=0)
-    parser.add_argument('--num-timesteps', type=int, default=int(1e6))
+    parser.add_argument('--num-timesteps', type=int, default=int(100))
     parser.add_argument('--save-interval', type=int, default=int(0))
     parser.add_argument('--model-pickle', help='model pickle', type=str, default='')
     parser.add_argument('--checkpoint', help='checkpoint file', type=str, default='')
     return parser
 
 def energyplus_locate_log_dir(index=0):
-    pat = energyplus_logbase_dir() + '/openai-????-??-??-??-??-??-??????*/progress.csv'
-    files = [(f, os.path.getmtime(f)) for f in glob.glob(pat)]
+    pat_openai = energyplus_logbase_dir() + f'/openai-????-??-??-??-??-??-??????*/progress.csv'
+    pat_ray = energyplus_logbase_dir() + f'/ray-????-??-??-??-??-??-??????*/*/progress.csv'
+    files = [
+        (f, os.path.getmtime(f))
+        for pat in [pat_openai, pat_ray]
+        for f in glob.glob(pat)
+    ]
     newest = sorted(files, key=lambda files: files[1])[-(1 + index)][0]
     dir = os.path.dirname(newest)
     print('energyplus_locate_log_dir: {}'.format(dir))
