@@ -76,8 +76,8 @@ class EnergyPlusModel2ZoneDataCenterHVAC_wEconomizer(EnergyPlusModel):
         self.action_space = spaces.Box(low =   np.array([ lo, lo]),
                                        high =  np.array([ hi, hi]),
                                        dtype = np.float32)
-        self.observation_space = spaces.Box(low =   np.array([-20.0, -20.0, -20.0,          0.0,          0.0,          0.0]),
-                                            high =  np.array([ 50.0,  50.0,  50.0, 1000000000.0, 1000000000.0, 1000000000.0]),
+        self.observation_space = spaces.Box(low   = np.array([-20.0, -20.0, -20.0,          0.0,          0.0,          0.0]),
+                                            high  = np.array([ 50.0, 100.0, 100.0, 1000000000.0, 1000000000.0, 1000000000.0]),
                                             dtype = np.float32)
         
     def set_raw_state(self, raw_state):
