@@ -3,12 +3,28 @@
 import sys
 
 from mpi4py import MPI
-from baselines_energyplus.common.energyplus_util import make_energyplus_env, energyplus_arg_parser, energyplus_logbase_dir
-from baselines import logger
+from baselines_energyplus.common.energyplus_util import (
+    energyplus_arg_parser,
+    energyplus_logbase_dir
+)
 from baselines.common.models import mlp
 from baselines.trpo_mpi import trpo_mpi
 import os
 import datetime
+from baselines import logger
+from baselines_energyplus.bench import Monitor
+import gym
+
+
+def make_energyplus_env(env_id, seed):
+    """
+    Create a wrapped, monitored gym.Env for EnergyEnv
+    """
+    env = gym.make(env_id)
+    env = Monitor(env, logger.get_dir())
+    env.seed(seed)
+    return env
+
 
 def train(env_id, num_timesteps, seed):
     # import baselines.common.tf_util as U
