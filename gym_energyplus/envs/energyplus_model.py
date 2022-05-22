@@ -230,7 +230,8 @@ class EnergyPlusModel(metaclass=ABCMeta):
         if self.timestamp_csv is None:
             while not os.path.isfile(self.monitor_file):
                 time.sleep(1)
-            self.timestamp_csv = os.stat(self.monitor_file).st_mtime - 1 # '-1' is a hack to prevent losing the first set of data
+            # '-1' is a hack to prevent losing the first set of data
+            self.timestamp_csv = os.stat(self.monitor_file).st_mtime - 1
 
         num_ep = 0
         ts = os.stat(self.monitor_file).st_mtime
@@ -238,42 +239,30 @@ class EnergyPlusModel(metaclass=ABCMeta):
             # Monitor file is updated.
             self.timestamp_csv = ts
 
-            def parse_openai_monitor(mfile):
+            def parse_monitor(mfile):
                 firstline = mfile.readline()
                 assert firstline.startswith('#')
                 metadata = json.loads(firstline[1:])
                 assert metadata['env_id'] == "EnergyPlus-v0"
-                assert set(metadata.keys()) == {'env_id', 't_start'},  "Incorrect keys in monitor metadata"
+                assert set(metadata.keys()) == {'env_id', 't_start'}, \
+                    "Incorrect keys in monitor metadata"
                 data = pd.read_csv(mfile, index_col=None)
-                assert set(data.keys()) == {'l', 't', 'r'}, "Incorrect keys in monitor logline"
-                return data
-
-            def parse_ray_progress(mfile):
-                data = pd.read_csv(mfile, index_col=None)
-                assert all([
-                    col in data.columns
-                    for col in ["episode_reward_mean", "episode_len_mean"]
-                ]), "couldn't find data keys in progress.csv"
+                assert set(data.keys()) == {'l', 't', 'r'}, \
+                    "Incorrect keys in monitor logline"
                 return data
 
             with open(self.monitor_file) as f:
-                if "openai" in self.monitor_file:
-                    df = parse_openai_monitor(f)
-                elif "ray" in self.monitor_file:
-                    df = parse_ray_progress(f)
-                else:
-                    raise ValueError(f"no parser for {self.monitor_file}")
+                df = parse_monitor(f)
 
             self.reward = []
             self.reward_mean = []
             self.episode_dirs = []
             self.num_episodes = 0
-            cols = ["r", "l"] if "openai" in self.monitor_file else ["episode_reward_mean", "episode_len_mean"]
+            cols = ["r", "l"]
             rew_length = zip(df[cols[0]], df[cols[1]])
             for rew, len in rew_length:
                 self.reward.append(rew / len)
                 self.reward_mean.append(rew / len)
-                # TODO: this doesn't work for ray
                 self.episode_dirs.append(
                     self.log_dir + '/output/episode-{:08d}-{:05}'.format(self.num_episodes, os.getpid()))
                 self.num_episodes += 1
