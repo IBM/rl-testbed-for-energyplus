@@ -145,12 +145,7 @@ class EnergyPlusModel(metaclass=ABCMeta):
 
     # Show convergence
     def show_progress(self):
-        # with openai, we have a single env created that dumps monitor.csv
-        # with ray, we use progress.csv
-        if "ray" in self.log_dir:
-            self.monitor_file = self.log_dir + "/progress.csv"
-        else:
-            self.monitor_file = self.log_dir + "/monitor.csv"
+        self.monitor_file = self.log_dir + "/monitor.csv"
 
         # Read progress file
         if not self.read_monitor_file():
@@ -261,8 +256,8 @@ class EnergyPlusModel(metaclass=ABCMeta):
             cols = ["r", "l"]
             rew_length = zip(df[cols[0]], df[cols[1]])
             for rew, len in rew_length:
-                self.reward.append(rew / len)
-                self.reward_mean.append(rew / len)
+                self.reward.append(float(rew) / len)
+                self.reward_mean.append(float(rew) / len)
                 self.episode_dirs.append(
                     self.log_dir + '/output/episode-{:08d}-{:05}'.format(self.num_episodes, os.getpid()))
                 self.num_episodes += 1
