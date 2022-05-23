@@ -1,17 +1,15 @@
 import json
 import time
-from typing import Optional, Dict
+from typing import Dict, Any
 
-from ray.rllib import BaseEnv, Policy, RolloutWorker
-from ray.rllib.agents import DefaultCallbacks
 import os.path as osp
 import csv
 
-from ray.rllib.evaluation import MultiAgentEpisode
-from ray.rllib.utils.typing import PolicyID
+from ray.tune.logger import LoggerCallback
+from ray.tune.trial import Trial
 
 
-class MonitorCallbacks(DefaultCallbacks):
+class MonitorCallbacks(LoggerCallback):
     EXT = "monitor.csv"
     f = None
 
@@ -36,29 +34,26 @@ class MonitorCallbacks(DefaultCallbacks):
             self.logger.writeheader()
             self.f.flush()
 
-    def on_episode_start(self,
-                         *,
-                         worker: RolloutWorker,
-                         base_env: BaseEnv,
-                         policies: Dict[PolicyID, Policy],
-                         episode: MultiAgentEpisode,
-                         env_index: Optional[int] = None,
-                         **kwargs) -> None:
+    def log_trial_start(self, trial: Trial):
         self.time_start = time.time()
 
-    def on_episode_end(self,
-                       *,
-                       worker: RolloutWorker,
-                       base_env: BaseEnv,
-                       policies: Dict[PolicyID, Policy],
-                       episode: MultiAgentEpisode,
-                       env_index: Optional[int] = None,
-                       **kwargs) -> None:
+    def log_trial_result(self, iteration: int, trial: Trial, result: Dict[str, Any]):
+        # print("iteration", iteration)
+        # print("result", result)
+        t = time.time()
+
         epinfo = {
-            "r": round(episode.total_reward, 6),
-            "l": episode.length,
-            "t": round(time.time() - self.time_start, 6)
+            "r": round(result["episode_reward_mean"], 6),
+            "l": result["episode_len_mean"],
+            "t": round(t - self.time_start, 6)
         }
         if self.logger:
             self.logger.writerow(epinfo)
             self.f.flush()
+
+        self.time_start = t
+
+    def log_trial_end(self, trial: Trial, failed: bool = False):
+        if self.f:
+            self.f.flush()
+            self.f.close()
