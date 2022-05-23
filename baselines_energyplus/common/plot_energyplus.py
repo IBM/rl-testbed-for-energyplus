@@ -5,7 +5,7 @@ import os
 
 import gym
 
-from baselines_energyplus.common.energyplus_util import make_energyplus_env, energyplus_locate_log_dir
+from baselines_energyplus.common.energyplus_util import energyplus_locate_log_dir
 
 
 def plot_energyplus_arg_parser():
