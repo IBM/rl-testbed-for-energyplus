@@ -258,12 +258,18 @@ class EnergyPlusModel(metaclass=ABCMeta):
             self.num_episodes = 0
             cols = ["r", "l"]
             rew_length = zip(df[cols[0]], df[cols[1]])
-            for rew, len in rew_length:
-                self.reward.append(float(rew) / len)
-                self.reward_mean.append(float(rew) / len)
-                self.episode_dirs.append(
-                    self.log_dir + '/output/episode-{:08d}-{:05}'.format(self.num_episodes, os.getpid()))
-                self.num_episodes += 1
+            for rew, l in rew_length:
+                self.reward.append(float(rew) / l)
+                self.reward_mean.append(float(rew) / l)
+
+            episodes_root = self.log_dir + '/output/'
+            self.episode_dirs = [
+                f"{episodes_root}/{ep}"
+                for ep in os.listdir(episodes_root)
+                if "episode-" in ep
+            ]
+            self.num_episodes = len(self.episode_dirs)
+
             if self.num_episodes > self.num_episodes_last:
                 self.num_episodes_last = self.num_episodes
                 return True
