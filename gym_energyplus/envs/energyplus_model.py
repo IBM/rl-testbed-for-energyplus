@@ -95,12 +95,15 @@ class EnergyPlusModel(metaclass=ABCMeta):
                 x_labels.append(dt.strftime('%m/%d'))
         return x_pos, x_labels
 
-    def set_action(self, normalized_action):
+    def set_action(self, normalized_action, framework):
+        self.action_prev = self.action
         # In TRPO/PPO1/PPO2 in baseline, action distribution is a gaussian with mu = 0, sigma = 1
         # So it must be scaled back into action_space by the environment.
-        self.action_prev = self.action
-        self.action = self.action_space.low + (normalized_action + 1.) * 0.5 * (self.action_space.high - self.action_space.low)
-        self.action = np.clip(self.action, self.action_space.low, self.action_space.high)
+        if framework == "openai":
+            self.action = self.action_space.low + (normalized_action + 1.) * 0.5 * (self.action_space.high - self.action_space.low)
+            self.action = np.clip(self.action, self.action_space.low, self.action_space.high)
+        else:
+            self.action = normalized_action
 
     @abstractmethod
     def setup_spaces(self): pass

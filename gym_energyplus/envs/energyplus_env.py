@@ -23,9 +23,11 @@ class EnergyPlusEnv(Env):
                  weather_file=None,
                  log_dir=None,
                  verbose=False,
-                 seed=None):
+                 seed=None,
+                 framework="openai"):
         self.energyplus_process = None
         self.pipe_io = None
+        self.framework = framework
 
         # Verify path arguments
         if energyplus_file is None:
@@ -184,7 +186,10 @@ class EnergyPlusEnv(Env):
             # baselines 0.1.6 changed action type
             if isinstance(action, np.ndarray) and isinstance(action[0], np.ndarray):
                 action = action[0]
-            self.ep_model.set_action(action)
+            self.ep_model.set_action(
+                normalized_action=action,
+                framework=self.framework
+            )
 
             if not self.send_action():
                 print('EnergyPlusEnv.step(): Failed to send an action. Quitting.')
