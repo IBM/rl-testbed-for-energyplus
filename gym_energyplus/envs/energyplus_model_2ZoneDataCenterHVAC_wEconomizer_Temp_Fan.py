@@ -79,7 +79,7 @@ class EnergyPlusModel2ZoneDataCenterHVAC_wEconomizer_Temp_Fan(EnergyPlusModel):
                                        high =  np.array([ hi, hi, flow_hi, flow_hi]),
                                        dtype = np.float32)
         self.observation_space = spaces.Box(low   = np.array([-20.0, -20.0, -20.0,          0.0,          0.0,          0.0]),
-                                            high  = np.array([ 50.0, 100.0, 100.0, 1000000000.0, 1000000000.0, 1000000000.0]),
+                                            high  = np.array([ 50.0, 200.0, 200.0, 1000000000.0, 1000000000.0, 1000000000.0]),
                                             dtype = np.float32)
         
     def set_raw_state(self, raw_state):
