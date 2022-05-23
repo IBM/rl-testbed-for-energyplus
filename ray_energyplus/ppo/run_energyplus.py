@@ -21,13 +21,22 @@ def env_creator(seed):
     """
     Create gym.Env for EnergyEnv
     """
-    return lambda cfg: EnergyPlusEnv(
-        energyplus_file=cfg["energyplus_file"],
-        model_file=cfg["model_file"],
-        weather_file=cfg["weather_file"],
-        log_dir=cfg["log_dir"],
-        seed=seed
-    )
+
+    def create_env(cfg):
+        env_cfg = {
+            k: cfg[k] for k in [
+                "energyplus_file",
+                "model_file",
+                "weather_file",
+                "log_dir",
+                "framework"
+            ]
+        }
+        env_cfg["seed"] = seed
+
+        return EnergyPlusEnv(**env_cfg)
+
+    return create_env
 
 
 def train(env_id, num_timesteps, seed):
@@ -35,62 +44,78 @@ def train(env_id, num_timesteps, seed):
 
     log_base = energyplus_logbase_dir()
     log_dir = os.path.join(log_base, experiment_id)
-    if not os.path.exists(log_dir + '/output'):
-        os.makedirs(log_dir + '/output')
+    if not os.path.exists(log_dir + "/output"):
+        os.makedirs(log_dir + "/output")
     os.environ["ENERGYPLUS_LOG"] = log_dir
 
-    model = os.getenv('ENERGYPLUS_MODEL')
+    model = os.getenv("ENERGYPLUS_MODEL")
     if model is None:
-        print('Environment variable ENERGYPLUS_MODEL is not defined')
+        print("Environment variable ENERGYPLUS_MODEL is not defined")
         sys.exit(1)
 
-    weather = os.getenv('ENERGYPLUS_WEATHER')
+    weather = os.getenv("ENERGYPLUS_WEATHER")
     if weather is None:
-        print('Environment variable ENERGYPLUS_WEATHER is not defined')
+        print("Environment variable ENERGYPLUS_WEATHER is not defined")
         sys.exit(1)
 
-    energyplus_file = os.getenv('ENERGYPLUS')
+    energyplus_file = os.getenv("ENERGYPLUS")
+    if energyplus_file is None:
+        print("Environment variable ENERGYPLUS is not defined")
+        sys.exit(1)
 
     # gym env registration
     env = env_creator(seed)
     register_env(env_id, env)
 
     # experiment configuration, including alg params
+    framework = "tf2"
     config = {
         "run": "PPO",
         "env": env_id,
         "config": {
-            "framework": "tf2",
+            "framework": framework,
             # see Ray PPO config for all options
-            "gamma": 0.85,
+            "gamma": 0.99,
             "kl_coeff": 0.2,
+            # if true, use the Generalized Advantage Estimator (GAE)
+            # with a value function, see https://arxiv.org/pdf/1506.02438.pdf.
+            "use_gae": True,
+            # GAE(lambda) parameter
+            "lambda": 0.97,
             # increase this if more CPUs are available
             "num_workers": 2,
             # small batches speed up training
             # you may want to increase these values for stability
-            "train_batch_size": 4000,
-            "rollout_fragment_length": 200,
-            # very large reward values require larger
-            # value function clipping value, otherwise would take
-            # large number of iterations to converge
+            "train_batch_size": 128,
+            "rollout_fragment_length": 64,
+            # magnitude of reward values require large
+            # value function clipping param (otherwise would take
+            # large number of iterations to converge)
             "vf_clip_param": 1000,
             # it's an (almost) continuous control problem
             # we split each year-long episode into 1-day logical episodes
-            # so rewards are computed
+            # so policy is updated more frequently.
+            # this setting is optional, you may want to comment / remove
+            # if you want to revert to full-episode setting
             "horizon": 96,
             # do not force env reset when horizon is hit
             "soft_horizon": True,
-            "batch_mode": "truncate_episodes",
+            # rescale observations
+            "observation_filter": "MeanStdFilter",
             # arguments passed to EnergyPlusEnv
             "env_config": {
                 "energyplus_file": energyplus_file,
                 "model_file": model,
                 "weather_file": weather,
-                "log_dir": log_dir
+                "log_dir": log_dir,
+                "framework": framework
             },
         },
+        # checkpoint every 2 iterations, and at end of experiment
+        # this allows to reload the policy model
         "checkpoint_freq": 2,
         "checkpoint_at_end": True,
+        # dir where tune will write its output
         "local_dir": log_base,
     }
 
