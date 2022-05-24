@@ -1,5 +1,7 @@
 ARG EPLUS_VERSION=22-1-0
 ARG EPLUS_DL_URL=https://github.com/NREL/EnergyPlus/releases/download/v22.1.0/EnergyPlus-22.1.0-ed759b17ee-Linux-Ubuntu20.04-x86_64.sh
+# either baselines or ray
+ARG RL_FRAMEWORK="baselines"
 
 # Stage 1
 FROM ubuntu:20.04 AS eplus-build
@@ -44,6 +46,7 @@ FROM ubuntu:20.04
 LABEL org.opencontainers.image.source=https://github.com/IBM/rl-testbed-for-energyplus
 
 ARG EPLUS_VERSION
+ARG RL_FRAMEWORK
 ENV DEBIAN_FRONTEND=noninteractive
 
 SHELL ["/bin/bash", "-c"]
@@ -70,9 +73,9 @@ RUN export EPLUS_INSTALL_PATH=/usr/local/EnergyPlus-${EPLUS_VERSION} && \
     # - baselines requires tensorflow installed first
     # - we need baselines to support tf2, which is only available in a git branch
     cd /root && \
-    cat ./rl-testbed-for-energyplus/requirements.txt | grep -v baselines | xargs pip3 install --ignore-installed && \
+    cat ./rl-testbed-for-energyplus/requirements/${RL_FRAMEWORK}.txt | grep -v baselines | xargs pip3 install --ignore-installed && \
     # install baselines sources in /root/src/baselines. They need to be added to PYTHONPATH
-    cat ./rl-testbed-for-energyplus/requirements.txt | grep baselines | xargs pip3 install && \
+    (cat ./rl-testbed-for-energyplus/requirements/${RL_FRAMEWORK}.txt | grep baselines | xargs pip3 install) || echo "not baselines" && \
     echo "source /root/.bashrc_eplus" >> /root/.bashrc && \
     # cleanup
     apt autoremove -y && rm -rf /var/lib/apt/lists/* && apt-get clean
