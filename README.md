@@ -203,7 +203,7 @@ Simulation process starts by the following command. The only applicable option i
 $ time python3 -m baselines_energyplus.trpo_mpi.run_energyplus --num-timesteps 1000000000
 ```
 
-#### Ray
+#### Ray RLlib
 
 ```
 $ time python3 -m ray_energyplus.ppo.run_energyplus --num-timesteps 1000000000

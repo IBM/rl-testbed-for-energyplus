@@ -10,10 +10,10 @@ See the existing [list of docker images](https://github.com/users/antoine-galata
 Usage example:
 
 ```shell
-docker pull ghcr.io/antoine-galataud/rl-testbed-for-energyplus:ep22.1.0
+docker pull ghcr.io/antoine-galataud/rl-testbed-for-energyplus:ray1.12.1_ep22.1.0
 ```
 
-where image tag `ep22.1.0` is the EnergyPlus version that the image is using.
+where image tag `ray1.12.1_ep22.1.0` are Ray RLlib and EnergyPlus versions the image was built with.
 
 ### Building
 
