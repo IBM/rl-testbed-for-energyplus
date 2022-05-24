@@ -5,7 +5,6 @@ import sys
 from ray import tune
 from ray.tune import register_env, Experiment
 
-# from baselines_energyplus.bench import Monitor
 from common.energyplus_util import (
     energyplus_arg_parser,
     energyplus_logbase_dir
@@ -129,6 +128,7 @@ def train(env_id, num_timesteps, seed):
     # callbacks
     tune_callbacks = [MonitorCallbacks(filename=log_dir, env_id=env_id)]
 
+    # run tune experiment
     experiment = Experiment.from_json(experiment_id, config)
     results = tune.run(
         run_or_experiment=experiment,
@@ -137,6 +137,8 @@ def train(env_id, num_timesteps, seed):
         callbacks=tune_callbacks,
         verbose=2
     )
+    # several pandas dataframes available
+    # for experiment analysis
     print(results.results_df)
 
 
