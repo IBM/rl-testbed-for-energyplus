@@ -26,12 +26,15 @@ cd rl-testbed-for-energyplus/
 docker build . -f docker/Dockerfile -t rl-testbed-for-energyplus
 ```
 
-The default EnergyPlus version used in the image is `22-1-0`. To use a different one, follow example below:
+The default EnergyPlus version used in the image is `22-1-0`. The default RL framework is OpenAI baselines.
+
+To use different options, follow example below:
 
 ```shell
 docker build . \
   --build-arg EPLUS_VERSION=9-6-0 \
   --build-arg EPLUS_DL_URL="<EnergyPlus download URL>" \
+  --build-arg RL_FRAMEWORK="ray" \
   -t rl-testbed-for-energyplus
 ```
 
