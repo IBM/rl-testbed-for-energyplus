@@ -18,8 +18,12 @@ We have tested on the following platforms.
 
 ## Installation
 
+### Docker
+
 The easiest way to setup a training environment is to use the docker image. See instructions [here](docker/README.md).
 For manual installation, see below.
+
+### Building from source
 
 Installation of rl-testbed-for-energyplus consists of three parts:
 
@@ -27,7 +31,7 @@ Installation of rl-testbed-for-energyplus consists of three parts:
 - Build patched EnergyPlus
 - Install built executables
 
-### Install EnergyPlus prebuilt package
+#### Install EnergyPlus prebuilt package
 
 First, download pre-built package of EnergyPlus and install it.
 This is not for executing normal version of EnergyPlus, but to get some pre-compiled binaries and data files that can not be generated from source code.
@@ -45,7 +49,7 @@ Supported EnergyPlus versions:
 
 You can also download the installer at https://github.com/NREL/EnergyPlus/releases/.
 
-#### Ubuntu
+##### Ubuntu
 
 1. Go to the web page shown above.
 2. Right click on relevant link in supported versions table and select `Save link As` to from the menu to download installation image.
@@ -64,14 +68,14 @@ Specify `/usr/local` for install directory.
 Respond with `/usr/local/bin` if asked for symbolic link location.
 The package will be installed at `/usr/local/EnergyPlus-<EPLUS_VERSION>`.
 
-#### macOS
+##### macOS
 
 1. Go to the web page shown above.
 2. Right click in supported versions table and select `Save link As` to from the menu to download installation image.
 3. Double click the downloaded package, and follow the instructions.
 The package will be installed in `/Applications/EnergyPlus-<EPLUS_VERSION>`.
 
-### Build patched EnergyPlus
+#### Build patched EnergyPlus
 
 Download source code of EnergyPlus and rl-testbed-for-energyplus. In below scripted lines, replace `<EPLUS_VERSION>`
 by the one you're using (for instance, `9.3.0`)
@@ -95,18 +99,20 @@ $ cmake -DCMAKE_INSTALL_PREFIX=/Applications/EnergyPlus-<EPLUS_VERSION> .. # mac
 $ make -j4
 ```
 
-### Install built executables
+#### Install built executables
+
 ```
 $ sudo make install
 ```
 
-### Install Python dependencies
+#### Install Python dependencies
 
+Python3 >= 3.8 is required.
 
-Python3 >= 3.5 is required.
+###### OpenAI Baselines
 
 ```
-$ pip3 install -r requirements.txt
+$ pip3 install -r requirements/baselines.txt
 ```
 
 Main dependencies:
@@ -124,11 +130,17 @@ For more information on baselines requirements, see https://github.com/openai/ba
 
 Older versions:
 
-To run on Ubuntu 18.04, you'll need the following pip dependencies (edit `requirements.txt`):
+To run on Ubuntu 18.04, you'll need the following pip dependencies:
 
 ```
 scipy==1.5.4
 tensorflow==1.15.4
+```
+
+###### Ray RLlib
+
+```
+$ pip3 install -r requirements/ray.txt
 ```
 
 ## How to run
@@ -182,6 +194,7 @@ export ENERGYPLUS_MODEL="${MODEL_DIR}/2ZoneDataCenterHVAC_wEconomizer_Temp_Fan.i
 ```
 
 ### Running
+
 Simulation process starts by the following command. The only applicable option is `--num-timesteps`
 
 ```
