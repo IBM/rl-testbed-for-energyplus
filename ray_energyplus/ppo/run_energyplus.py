@@ -16,6 +16,8 @@ import datetime
 from gym_energyplus.envs import EnergyPlusEnv
 from ray_energyplus.common.callbacks import MonitorCallbacks
 
+PYTHON_MIN_VERSION = (3, 8)
+
 
 def env_creator(seed):
     """
@@ -139,6 +141,9 @@ def train(env_id, num_timesteps, seed):
 
 
 def main():
+    if sys.version_info[0:2] < PYTHON_MIN_VERSION:
+        raise Exception(f'Requires python {PYTHON_MIN_VERSION}')
+
     args = energyplus_arg_parser().parse_args()
     train(args.env, num_timesteps=args.num_timesteps, seed=args.seed)
 
