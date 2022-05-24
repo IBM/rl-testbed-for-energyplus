@@ -2,6 +2,7 @@ import unittest
 
 from gym import spaces
 
+from gym_energyplus.envs.energyplus_build_model import build_ep_model
 from gym_energyplus.envs.energyplus_model_2ZoneDataCenterHVAC_wEconomizer_Temp import (
     EnergyPlusModel2ZoneDataCenterHVAC_wEconomizer_Temp
 )
@@ -61,3 +62,15 @@ class TestEnergyPlusModel(unittest.TestCase):
 
         self.assertIsInstance(model.observation_space, spaces.Box)
         self.assertEqual((6,), model.observation_space.shape)
+
+    def test_ep_model_build(self):
+        with self.assertRaises(ValueError):
+            build_ep_model(model_file="unknown", log_dir=None)
+
+        self.assertIsInstance(
+            build_ep_model(
+                model_file="EnergyPlus/Model-22-1-0/2ZoneDataCenterHVAC_wEconomizer_Temp_Fan.idf",
+                log_dir=None
+            ),
+            EnergyPlusModel2ZoneDataCenterHVAC_wEconomizer_Temp_Fan
+        )
