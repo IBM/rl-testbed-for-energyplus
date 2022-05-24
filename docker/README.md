@@ -50,8 +50,10 @@ to start the container and open a shell. Then:
 
 ```shell
 cd /root/rl-testbed-for-energyplus
-# launch
+# launch (OpenAI baselines)
 time python3 -m baselines_energyplus.trpo_mpi.run_energyplus --num-timesteps 1000000000
+# launch (Ray RLlib - PPO)
+time python3 -m ray_energyplus.ppo.run_energyplus --num-timesteps 1000000000
 ```
 
 Another option is to use your own project sources to launch a training (e.g. you have forked present git repo). To do 
@@ -90,7 +92,7 @@ docker run -it \
 Run the experiment, then run monitoring tool as usual (inside the container):
 
 ```shell
-python3 -m baselines_energyplus.common.plot_energyplus
+python3 -m common.plot_energyplus
 ```
 
 For more information, see also [this tutorial](http://wiki.ros.org/docker/Tutorials/GUI)
