@@ -6,7 +6,7 @@ from ray import tune
 from ray.tune import register_env, Experiment
 
 # from baselines_energyplus.bench import Monitor
-from baselines_energyplus.common.energyplus_util import (
+from common.energyplus_util import (
     energyplus_arg_parser,
     energyplus_logbase_dir
 )

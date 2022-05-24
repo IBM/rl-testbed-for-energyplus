@@ -2,7 +2,6 @@
 Helpers for script run_energyplus.py.
 """
 import os
-import gym
 import glob
 # following import necessary to register EnergyPlus-v0 env
 import gym_energyplus  # noqa

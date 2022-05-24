@@ -3,7 +3,7 @@
 import sys
 
 from mpi4py import MPI
-from baselines_energyplus.common.energyplus_util import (
+from common.energyplus_util import (
     energyplus_arg_parser,
     energyplus_logbase_dir
 )

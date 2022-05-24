@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # noinspection PyUnresolvedReferences
 import argparse
-import os
+import sys
 
 import gym
 
-from baselines_energyplus.common.energyplus_util import energyplus_locate_log_dir
+from common.energyplus_util import energyplus_locate_log_dir
 
 
 def plot_energyplus_arg_parser():
@@ -24,7 +24,7 @@ def plot_energyplus_arg_parser():
 def energyplus_plot(env_id, log_dir='', csv_file='', dump_timesteps=False, dump_episodes=False):
     if log_dir is not '' and csv_file is not '':
         print('Either log directory or csv file can be specified')
-        os.exit(1)
+        sys.exit(1)
     if log_dir is '' and csv_file is '':
         log_dir = energyplus_locate_log_dir()
     env = gym.make(env_id)
