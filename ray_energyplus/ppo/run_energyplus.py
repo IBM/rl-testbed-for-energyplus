@@ -69,12 +69,11 @@ def train(env_id, num_timesteps, seed):
     register_env(env_id, env)
 
     # experiment configuration, including alg params
-    framework = "tf2"
     config = {
         "run": "PPO",
         "env": env_id,
         "config": {
-            "framework": framework,
+            "framework": "tf2",
             # see Ray PPO config for all options
             "gamma": 0.99,
             "kl_coeff": 0.2,
@@ -109,7 +108,7 @@ def train(env_id, num_timesteps, seed):
                 "model_file": model,
                 "weather_file": weather,
                 "log_dir": log_dir,
-                "framework": framework
+                "framework": "ray"
             },
         },
         # checkpoint every 2 iterations, and at end of experiment
