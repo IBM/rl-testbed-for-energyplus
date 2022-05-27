@@ -305,3 +305,4 @@ isbn="978-981-13-2853-4"
 - EnergyPlus: https://github.com/NREL/EnergyPlus
 - OpenAI Gym: https://github.com/OpenAI/gym
 - OpenAI Baselines: https://github.com/OpenAI/baselines
+- Ray: https://github.com/ray-project/ray
