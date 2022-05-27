@@ -1,20 +1,17 @@
 # Copyright (c) IBM Corp. 2018. All Rights Reserved.
 # Project name: Reinforcement Learning Testbed for Power Consumption Optimization
 # This project is licensed under the MIT License, see LICENSE
+import shlex
 
 from gym import Env
-from gym import spaces
 from gym.utils import seeding
-import sys, os, subprocess, time, signal, stat
+import os, subprocess
 from glob import glob
 import gzip
 import shutil
 import numpy as np
-from scipy.special import expit
-import pandas as pd
 from argparse import ArgumentParser
 from gym_energyplus.envs.pipe_io import PipeIo
-from gym_energyplus.envs.energyplus_model import EnergyPlusModel
 from gym_energyplus.envs.energyplus_build_model import build_ep_model
 
 class EnergyPlusEnv(Env):
@@ -25,26 +22,26 @@ class EnergyPlusEnv(Env):
                  model_file=None,
                  weather_file=None,
                  log_dir=None,
-                 verbose=False):
+                 verbose=False,
+                 seed=None,
+                 framework="openai"):
         self.energyplus_process = None
         self.pipe_io = None
-        
+        self.framework = framework
+
         # Verify path arguments
         if energyplus_file is None:
             energyplus_file = os.getenv('ENERGYPLUS')
         if energyplus_file is None:
-            print('energyplus_env: FATAL: EnergyPlus executable is not specified. Use environment variable ENERGYPLUS.')
-            return None
+            raise ValueError('energyplus_env: FATAL: EnergyPlus executable is not specified. Use environment variable ENERGYPLUS.')
         if model_file is None:
             model_file = os.getenv('ENERGYPLUS_MODEL')
         if model_file is None:
-            print('energyplus_env: FATAL: EnergyPlus model file is not specified. Use environment variable ENERGYPLUS_MODEL.')
-            return None
+            raise ValueError('energyplus_env: FATAL: EnergyPlus model file is not specified. Use environment variable ENERGYPLUS_MODEL.')
         if weather_file is None:
             weather_file = os.getenv('ENERGYPLUS_WEATHER')
         if weather_file is None:
-            print('energyplus_env: FATAL: EnergyPlus weather file is not specified. Use environment variable ENERGYPLUS_WEATHER.')
-            return None
+            raise ValueError('energyplus_env: FATAL: EnergyPlus weather file is not specified. Use environment variable ENERGYPLUS_WEATHER.')
         if log_dir is None:
             log_dir = os.getenv('ENERGYPLUS_LOG')
         if log_dir is None:
@@ -67,7 +64,7 @@ class EnergyPlusEnv(Env):
         self.episode_idx = -1
         self.verbose = verbose
 
-        self.seed()
+        self.seed(seed)
         
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -90,7 +87,7 @@ class EnergyPlusEnv(Env):
         print('Starting new environment')
         assert(self.energyplus_process is None)
 
-        output_dir = self.log_dir + '/output/episode-{:08}'.format(self.episode_idx)
+        output_dir = self.get_output_dir()
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
         self.pipe_io.start()
@@ -119,12 +116,16 @@ class EnergyPlusEnv(Env):
 
         # Spawn a process
         cmd = self.energyplus_file \
-              + ' -r -x' \
+              + ' -r ' \
               + ' -d ' + output_dir \
               + ' -w ' + copy_weather_file \
               + ' ' + copy_model_file
         print('Starting EnergyPlus with command: %s' % cmd)
-        self.energyplus_process = subprocess.Popen(cmd.split(' '), shell=False)
+        self.energyplus_process = subprocess.Popen(
+            shlex.split(cmd),
+            shell=False,
+            cwd=output_dir
+        )
 
     def stop_instance(self):
         if self.energyplus_process is not None:
@@ -145,7 +146,7 @@ class EnergyPlusEnv(Env):
                         tokens = line.split()
                         return int(tokens[6])
                 return -1
-            epsode_dir = self.log_dir + '/output/episode-{:08}'.format(self.episode_idx)
+            epsode_dir = self.get_output_dir()
             file_csv = epsode_dir + '/eplusout.csv'
             file_csv_gz = epsode_dir + '/eplusout.csv.gz'
             file_err = epsode_dir + '/eplusout.err'
@@ -185,7 +186,10 @@ class EnergyPlusEnv(Env):
             # baselines 0.1.6 changed action type
             if isinstance(action, np.ndarray) and isinstance(action[0], np.ndarray):
                 action = action[0]
-            self.ep_model.set_action(action)
+            self.ep_model.set_action(
+                normalized_action=action,
+                framework=self.framework
+            )
 
             if not self.send_action():
                 print('EnergyPlusEnv.step(): Failed to send an action. Quitting.')
@@ -250,6 +254,9 @@ class EnergyPlusEnv(Env):
 
     def dump_episodes(self, log_dir='', csv_file='', reward_file=''):
         self.ep_model.dump_episodes(log_dir=log_dir, csv_file=csv_file)
+
+    def get_output_dir(self):
+        return self.log_dir + '/output/episode-{:08}-{:05}'.format(self.episode_idx, os.getpid())
         
 def parser():
     usage = 'Usage: python {} [--verbose] [--energyplus <file>] [--model <file>] [--weather <file>] [--simulate] [--plot] [--help]'.format(__file__)

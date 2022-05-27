@@ -20,9 +20,9 @@ jobs:
       run: |
         sudo apt install -y python3-mpi4py
         python -m pip install --upgrade pip
-        if [ -f requirements.txt ]; then 
-          cat requirements.txt | grep -v baselines | xargs pip install --ignore-installed
-          cat requirements.txt | grep baselines | xargs pip install --ignore-installed
+        if [ -f requirements/baselines.txt ]; then 
+          cat requirements/baselines.txt | grep -v baselines | xargs pip install --ignore-installed
+          cat requirements/baselines.txt | grep baselines | xargs pip install --ignore-installed
         fi
     - name: Test python code with unittest
       run: |

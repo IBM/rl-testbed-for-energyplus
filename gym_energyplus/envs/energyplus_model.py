@@ -4,14 +4,11 @@
 
 from abc import ABCMeta, abstractmethod
 import os, sys, time
-from scipy.special import expit
 import numpy as np
 from datetime import datetime, timedelta
 from glob import glob
-from matplotlib.widgets import Slider, Button, RadioButtons
-import datetime as dt
+from matplotlib.widgets import Slider, Button
 import matplotlib.pyplot as plt
-import matplotlib
 import pandas as pd
 import math
 import json
@@ -98,12 +95,15 @@ class EnergyPlusModel(metaclass=ABCMeta):
                 x_labels.append(dt.strftime('%m/%d'))
         return x_pos, x_labels
 
-    def set_action(self, normalized_action):
+    def set_action(self, normalized_action, framework):
+        self.action_prev = self.action
         # In TRPO/PPO1/PPO2 in baseline, action distribution is a gaussian with mu = 0, sigma = 1
         # So it must be scaled back into action_space by the environment.
-        self.action_prev = self.action
-        self.action = self.action_space.low + (normalized_action + 1.) * 0.5 * (self.action_space.high - self.action_space.low)
-        self.action = np.clip(self.action, self.action_space.low, self.action_space.high)
+        if framework == "openai":
+            self.action = self.action_space.low + (normalized_action + 1.) * 0.5 * (self.action_space.high - self.action_space.low)
+            self.action = np.clip(self.action, self.action_space.low, self.action_space.high)
+        else:
+            self.action = normalized_action
 
     @abstractmethod
     def setup_spaces(self): pass
@@ -148,7 +148,7 @@ class EnergyPlusModel(metaclass=ABCMeta):
 
     # Show convergence
     def show_progress(self):
-        self.monitor_file = self.log_dir + '/monitor.csv'
+        self.monitor_file = self.log_dir + "/monitor.csv"
 
         # Read progress file
         if not self.read_monitor_file():
@@ -228,32 +228,48 @@ class EnergyPlusModel(metaclass=ABCMeta):
         if self.timestamp_csv is None:
             while not os.path.isfile(self.monitor_file):
                 time.sleep(1)
-            self.timestamp_csv = os.stat(self.monitor_file).st_mtime - 1 # '-1' is a hack to prevent losing the first set of data
+            # '-1' is a hack to prevent losing the first set of data
+            self.timestamp_csv = os.stat(self.monitor_file).st_mtime - 1
 
         num_ep = 0
         ts = os.stat(self.monitor_file).st_mtime
         if ts > self.timestamp_csv:
             # Monitor file is updated.
             self.timestamp_csv = ts
-            f = open(self.monitor_file)
-            firstline = f.readline()
-            assert firstline.startswith('#')
-            metadata = json.loads(firstline[1:])
-            assert metadata['env_id'] == "EnergyPlus-v0"
-            assert set(metadata.keys()) == {'env_id', 't_start'},  "Incorrect keys in monitor metadata"
-            df = pd.read_csv(f, index_col=None)
-            assert set(df.keys()) == {'l', 't', 'r'}, "Incorrect keys in monitor logline"
-            f.close()
+
+            def parse_monitor(mfile):
+                firstline = mfile.readline()
+                assert firstline.startswith('#')
+                metadata = json.loads(firstline[1:])
+                assert metadata['env_id'] == "EnergyPlus-v0"
+                assert set(metadata.keys()) == {'env_id', 't_start'}, \
+                    "Incorrect keys in monitor metadata"
+                data = pd.read_csv(mfile, index_col=None)
+                assert set(data.keys()) == {'l', 't', 'r'}, \
+                    "Incorrect keys in monitor logline"
+                return data
+
+            with open(self.monitor_file) as f:
+                df = parse_monitor(f)
 
             self.reward = []
             self.reward_mean = []
             self.episode_dirs = []
             self.num_episodes = 0
-            for rew, len, time_ in zip(df['r'], df['l'], df['t']):
-                self.reward.append(rew / len)
-                self.reward_mean.append(rew / len)
-                self.episode_dirs.append(self.log_dir + '/output/episode-{:08d}'.format(self.num_episodes))
-                self.num_episodes += 1
+            cols = ["r", "l"]
+            rew_length = zip(df[cols[0]], df[cols[1]])
+            for rew, l in rew_length:
+                self.reward.append(float(rew) / l)
+                self.reward_mean.append(float(rew) / l)
+
+            episodes_root = self.log_dir + '/output/'
+            self.episode_dirs = [
+                f"{episodes_root}/{ep}"
+                for ep in os.listdir(episodes_root)
+                if "episode-" in ep
+            ]
+            self.num_episodes = len(self.episode_dirs)
+
             if self.num_episodes > self.num_episodes_last:
                 self.num_episodes_last = self.num_episodes
                 return True
@@ -323,8 +339,8 @@ class EnergyPlusModel(metaclass=ABCMeta):
             # Make a list of all episodes
             # Note: Somethimes csv file is missing in the episode directories
             # We accept gziped csv file also.
-            csv_list = glob(log_dir + '/output/episode-????????/eplusout.csv') \
-                       + glob(log_dir + '/output/episode-????????/eplusout.csv.gz')
+            csv_list = glob(log_dir + '/output/episode.*/eplusout.csv') \
+                       + glob(log_dir + '/output/episode.*/eplusout.csv.gz')
             self.episode_dirs = list(set([os.path.dirname(i) for i in csv_list]))
             self.episode_dirs.sort()
             self.num_episodes = len(self.episode_dirs)

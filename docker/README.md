@@ -10,10 +10,10 @@ See the existing [list of docker images](https://github.com/users/antoine-galata
 Usage example:
 
 ```shell
-docker pull ghcr.io/antoine-galataud/rl-testbed-for-energyplus:ep22.1.0
+docker pull ghcr.io/antoine-galataud/rl-testbed-for-energyplus:ray1.12.1_ep22.1.0
 ```
 
-where image tag `ep22.1.0` is the EnergyPlus version that the image is using.
+where image tag `ray1.12.1_ep22.1.0` are Ray RLlib and EnergyPlus versions the image was built with.
 
 ### Building
 
@@ -26,12 +26,15 @@ cd rl-testbed-for-energyplus/
 docker build . -f docker/Dockerfile -t rl-testbed-for-energyplus
 ```
 
-The default EnergyPlus version used in the image is `22-1-0`. To use a different one, follow example below:
+The default EnergyPlus version used in the image is `22-1-0`. The default RL framework is OpenAI baselines.
+
+To use different options, follow example below:
 
 ```shell
 docker build . \
   --build-arg EPLUS_VERSION=9-6-0 \
   --build-arg EPLUS_DL_URL="<EnergyPlus download URL>" \
+  --build-arg RL_FRAMEWORK="ray" \
   -t rl-testbed-for-energyplus
 ```
 
@@ -47,8 +50,10 @@ to start the container and open a shell. Then:
 
 ```shell
 cd /root/rl-testbed-for-energyplus
-# launch
+# launch (OpenAI baselines)
 time python3 -m baselines_energyplus.trpo_mpi.run_energyplus --num-timesteps 1000000000
+# launch (Ray RLlib - PPO)
+time python3 -m ray_energyplus.ppo.run_energyplus --num-timesteps 1000000000
 ```
 
 Another option is to use your own project sources to launch a training (e.g. you have forked present git repo). To do 
@@ -87,7 +92,7 @@ docker run -it \
 Run the experiment, then run monitoring tool as usual (inside the container):
 
 ```shell
-python3 -m baselines_energyplus.common.plot_energyplus
+python3 -m common.plot_energyplus
 ```
 
 For more information, see also [this tutorial](http://wiki.ros.org/docker/Tutorials/GUI)

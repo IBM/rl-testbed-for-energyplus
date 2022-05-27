@@ -1,0 +1,9 @@
+numpy==1.19.5
+pandas==1.0.3
+scipy==1.8.0
+matplotlib==3.2.1
+tensorflow==2.5.3
+gym==0.21.0
+ray[rllib]==1.12.1
+ray[default]==1.12.1
+tqdm~=4.64

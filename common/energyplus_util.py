@@ -1,27 +1,11 @@
 """
 Helpers for script run_energyplus.py.
 """
-
 import os
-import gym
-from baselines import logger
-from baselines_energyplus.bench import Monitor
-from baselines.common import set_global_seeds
-from baselines.common.atari_wrappers import make_atari, wrap_deepmind
-from baselines.common.vec_env.subproc_vec_env import SubprocVecEnv
-from mpi4py import MPI
 import glob
 # following import necessary to register EnergyPlus-v0 env
-import gym_energyplus
+import gym_energyplus  # noqa
 
-def make_energyplus_env(env_id, seed):
-    """
-    Create a wrapped, monitored gym.Env for EnergyEnv
-    """
-    env = gym.make(env_id)
-    env = Monitor(env, logger.get_dir())
-    env.seed(seed)
-    return env
 
 def arg_parser():
     """
@@ -30,9 +14,10 @@ def arg_parser():
     import argparse
     return argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
+
 def energyplus_arg_parser():
     """
-    Create an argparse.ArgumentParser for run_energypl.py.
+    Create an argparse.ArgumentParser for run_energyplus.py.
     """
     parser = arg_parser()
     parser.add_argument('--env', '-e', help='environment ID', type=str, default='EnergyPlus-v0')
@@ -43,13 +28,24 @@ def energyplus_arg_parser():
     parser.add_argument('--checkpoint', help='checkpoint file', type=str, default='')
     return parser
 
+
 def energyplus_locate_log_dir(index=0):
-    pat = energyplus_logbase_dir() + '/openai-????-??-??-??-??-??-??????*/progress.csv'
-    files = [(f, os.path.getmtime(f)) for f in glob.glob(pat)]
+    pat_openai = energyplus_logbase_dir() + f'/openai-????-??-??-??-??-??-??????*/progress.csv'
+    pat_ray = energyplus_logbase_dir() + f'/ray-????-??-??-??-??-??-??????*/*/progress.csv'
+    files = [
+        (f, os.path.getmtime(f))
+        for pat in [pat_openai, pat_ray]
+        for f in glob.glob(pat)
+    ]
     newest = sorted(files, key=lambda files: files[1])[-(1 + index)][0]
     dir = os.path.dirname(newest)
+    # in ray, progress.csv is in a subdir, so we need to get
+    # one step upper.
+    if "/ray-" in dir:
+        dir = os.path.dirname(dir)
     print('energyplus_locate_log_dir: {}'.format(dir))
     return dir
+
 
 def energyplus_logbase_dir():
     logbase_dir = os.getenv('ENERGYPLUS_LOGBASE')
