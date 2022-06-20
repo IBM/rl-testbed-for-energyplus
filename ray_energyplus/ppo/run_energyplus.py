@@ -73,7 +73,10 @@ def train(env_id, num_timesteps, seed):
         "run": "PPO",
         "env": env_id,
         "config": {
+            # use 'tf' (static graph) or 'tf2' (eager execution)
             "framework": "tf2",
+            # speed up tf2 execution
+            "eager_tracing": True,
             # see Ray PPO config for all options
             "gamma": 0.99,
             "kl_coeff": 0.2,
