@@ -1,5 +1,5 @@
-ARG EPLUS_VERSION=22-2-0
-ARG EPLUS_DL_URL=https://github.com/NREL/EnergyPlus/releases/download/v22.2.0/EnergyPlus-22.2.0-c249759bad-Linux-Ubuntu20.04-x86_64.sh
+ARG EPLUS_VERSION=22-1-0
+ARG EPLUS_DL_URL=https://github.com/NREL/EnergyPlus/releases/download/v22.1.0/EnergyPlus-22.1.0-ed759b17ee-Linux-Ubuntu20.04-x86_64.sh
 # either baselines or ray
 ARG RL_FRAMEWORK="baselines"
 
