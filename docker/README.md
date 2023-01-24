@@ -10,10 +10,10 @@ See the existing [list of docker images](https://github.com/users/antoine-galata
 Usage example:
 
 ```shell
-docker pull ghcr.io/antoine-galataud/rl-testbed-for-energyplus:ray1.12.1_ep22.1.0
+docker pull ghcr.io/antoine-galataud/rl-testbed-for-energyplus:ray1.12.1_ep22.2.0
 ```
 
-where image tag `ray1.12.1_ep22.1.0` are Ray RLlib and EnergyPlus versions the image was built with.
+where image tag `ray1.12.1_ep22.2.0` are Ray RLlib and EnergyPlus versions the image was built with.
 
 ### Building
 
@@ -26,7 +26,7 @@ cd rl-testbed-for-energyplus/
 docker build . -f docker/Dockerfile -t rl-testbed-for-energyplus
 ```
 
-The default EnergyPlus version used in the image is `22-1-0`. The default RL framework is OpenAI baselines.
+The default EnergyPlus version used in the image is `22-2-0`. The default RL framework is OpenAI baselines.
 
 To use different options, follow example below:
 
