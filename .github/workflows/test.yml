@@ -18,7 +18,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install python dependencies
       run: |
-        sudo apt install -y python3-mpi4py
+        sudo apt install -y libopenmpi-dev
         python -m pip install --upgrade pip
         if [ -f requirements/baselines.txt ]; then 
           cat requirements/baselines.txt | grep -v baselines | xargs pip install --ignore-installed
