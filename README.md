@@ -47,6 +47,8 @@ Supported EnergyPlus versions:
 | 9.4.0 | [EnergyPlus-9.4.0-998c4b761e-Linux-Ubuntu20.04-x86_64.sh](https://github.com/NREL/EnergyPlus/releases/download/v9.4.0/EnergyPlus-9.4.0-998c4b761e-Linux-Ubuntu20.04-x86_64.sh) | [EnergyPlus-9.4.0-998c4b761e-Darwin-macOS10.15-x86_64.dmg](https://github.com/NREL/EnergyPlus/releases/download/v9.4.0/EnergyPlus-9.4.0-998c4b761e-Darwin-macOS10.15-x86_64.dmg) |
 | 9.5.0 | [EnergyPlus-9.5.0-de239b2e5f-Linux-Ubuntu20.04-x86_64.sh](https://github.com/NREL/EnergyPlus/releases/download/v9.5.0/EnergyPlus-9.5.0-de239b2e5f-Linux-Ubuntu20.04-x86_64.sh) | [EnergyPlus-9.5.0-de239b2e5f-Darwin-macOS11.2-arm64.dmg](https://github.com/NREL/EnergyPlus/releases/download/v9.5.0/EnergyPlus-9.5.0-de239b2e5f-Darwin-macOS11.2-arm64.dmg) |
 
+and up to EnergyPlus 22.2.0. See `EnergyPlus` folder which provides a list of available patches.
+
 You can also download the installer at https://github.com/NREL/EnergyPlus/releases/.
 
 ##### Ubuntu
