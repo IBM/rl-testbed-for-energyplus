@@ -2,7 +2,7 @@ numpy==1.24.1
 pandas==1.3.5
 scipy==1.10.0
 matplotlib==3.2.1
-tensorflow==2.11.1
+tensorflow==2.12.1
 gym==0.21.0
 ray[rllib]==1.12.1
 ray[default]==1.12.1
